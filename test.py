@@ -5,34 +5,9 @@ PREFIXES = ["у", "от", "о", "раз", "расс", "рас", "со", "с", "�
 REFLEX1 = 'ся'
 REFLEX2 = 'сь'
 
-words = [
-    "быть",
-    "мочь",
-    "говорить",
-    "сказать" ,
-    "захотеть",
-    "рассказывать",
-    "рассказать",
-    "кататься",
-    "катать",
-    "скатить",
-    "катить",
-    "покатиться",
-    "катиться",
-    "пробегать",
-    "пробежать",
-    "бегать",
-    "бежать"
-]
+words = []
 
-# Init scores to 0
 scores = []
-lenwords = len(words)
-for i in range(lenwords):
-    scores.append([])
-    for j in range(lenwords):
-        scores[i].append(0)
-
 def noReflexiveForm(verb):
     newForm = verb
     reflexive = (verb.endswith(REFLEX1) or verb.endswith(REFLEX2))
@@ -72,6 +47,12 @@ def compare(word1, word2):
     return 0
 
 def setScores():
+    # Init scores to 0
+    for i in range(lenwords):
+        scores.append([])
+        for j in range(lenwords):
+            scores[i].append(0)
+
     for i in range(lenwords):
         for j in range(i, lenwords):
             if i == j: # avoid matching one verb with itself
@@ -87,11 +68,6 @@ def prettyPrintScores():
         for j in range(lenwords):
             deepScores += words[j] + " " + str(scores[i][j]) + ", "
         print (word + ": " + deepScores[:-1] + "]")
-
-setScores()
-prettyPrintScores()
-
-verbsWithClusters = []
 
 def sortWords(i, disabledWords=[], r=3):
     if i in disabledWords: # skip verb if she was already clustered
@@ -125,10 +101,39 @@ def sortWords(i, disabledWords=[], r=3):
     else:
         return currentVerb, disabledWords
 
+words = [
+    "быть",
+    "мочь",
+    "говорить",
+    "сказать" ,
+    "захотеть",
+    "рассказывать",
+    "рассказать",
+    "кататься",
+    "катать",
+    "скатить",
+    "катить",
+    "покатиться",
+    "катиться",
+    "пробегать",
+    "пробежать",
+    "бегать",
+    "бежать"
+]
+for
+
+lenwords = len(words)
+
+setScores()
+prettyPrintScores()
+
+verbsWithClusters = []
+
 for i in range(lenwords):
-    e, disabledWords  = sortWords(i)
+    e, disabledWords = sortWords(i)
     if e != None:
         verbsWithClusters.append(e)
 
 for e in verbsWithClusters:
     print(str(e))
+
