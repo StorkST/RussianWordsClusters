@@ -1,4 +1,5 @@
 import textdistance
+import types
 
 PREFIXES = ["у", "от", "о", "раз", "расс", "рас", "со", "с", "при", "проис", "про", "пере", "под", "по", "за", "до", "недо", "на", "вы", "воз", "вз", "в", "из", "ис"]  # Usual verb prefixes
 REFLEX1 = 'ся'
@@ -89,30 +90,35 @@ setScores()
 prettyPrintScores()
 
 verbsWithClusters = []
-disabledVerbs = []
 
-def sortWords(i):
-    if i in disabledVerbs: # skip verb if she was already clustered
-        return None
+def sortWords(i, disabledWords=[], r=1):
+    if i in disabledWords: # skip verb if she was already clustered
+        return None, disabledWords
 
     currentVerb = words[i]
     cluster = []
     for j in range(lenwords):
-        if j in disabledVerbs: # skip verb if she was already clustered
+        if j in disabledWords: # skip verb if she was already clustered
             continue
         score = scores[i][j]
         if score == 1:
             matchedVerb = words[j]
             cluster.append(matchedVerb)
-            disabledVerbs.append(j) # disable matchedVerb
+            if r > 0:
+                e, disabledWords = sortWords(j, disabledWords, 0) # recurse to merge clusters into the top one
+                if isinstance(cluster, list):
+                    cluster.extend(e)
+                else:
+                    cluster.append(e)
+            disabledWords.append(j) # disable matchedVerb
     if len(cluster) != 0:
         cluster.insert(0, currentVerb)
-        return cluster
+        return cluster, disabledWords
     else:
-        return currentVerb
+        return currentVerb, disabledWords
 
 for i in range(lenwords):
-    e = sortWords(i)
+    e, disabledWords  = sortWords(i)
     if e != None:
         verbsWithClusters.append(e)
 
