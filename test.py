@@ -100,21 +100,23 @@ def sortWords(i, disabledWords=[], r=1):
     for j in range(lenwords):
         if j in disabledWords: # skip verb if she was already clustered
             continue
+
         score = scores[i][j]
         if score == 1:
             matchedVerb = words[j]
-            cluster.append(matchedVerb)
             if r > 0:
+                disabledWords.append(i) # To not loop on the current word
                 e, disabledWords = sortWords(j, disabledWords, 0) # recurse to merge clusters into the top one
                 if isinstance(cluster, list):
                     cluster.extend(e)
                 else:
                     cluster.append(e)
+            else:
+                cluster.append(matchedVerb)
             disabledWords.append(j) # disable matchedVerb
     if len(cluster) != 0:
-        if i not in disabledWords:
-            cluster.insert(0, currentVerb)
-            disabledWords.append(i)
+        #if i not in disabledWords: # TODO: why need this?
+        cluster.insert(0, currentVerb)
         return cluster, disabledWords
     else:
         return currentVerb, disabledWords
