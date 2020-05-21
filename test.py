@@ -1,8 +1,4 @@
-#быть
-#мочь/смочь
-#говорить/сказать
-#хотеть/захотеть
-#рассказывать/рассказать
+import textdistance
 
 PREFIXES = ["у", "от", "о", "раз", "расс", "рас", "со", "с", "при", "проис", "про", "пере", "под", "по", "за", "до", "недо", "на", "вы", "воз", "вз", "в", "из", "ис"]  # Usual verb prefixes
 REFLEX1 = 'ся'
@@ -63,7 +59,12 @@ def compare(word1, word2):
     w1Stem = possibleStem(word1)
     w2Stem = possibleStem(word2)
     if (w1Stem in w2Stem) or (w2Stem in w1Stem):
-        return 0.9
+        return 1
+
+    #dlDistance = textdistance.damerau_levenshtein.normalized_distance("a", "aa")
+    dlDistance = textdistance.damerau_levenshtein(noReflexiveForm(word1), noReflexiveForm(word2))
+    if dlDistance <= 1:
+        return 1
 
     return 0
 
