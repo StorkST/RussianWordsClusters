@@ -37,12 +37,12 @@ def compare(word1, word2):
     if (w1Stem in w2Stem) or (w2Stem in w1Stem):
         return 1
 
-    #dlDistance = textdistance.damerau_levenshtein.normalized_distance(noReflexiveForm(word1), noReflexiveForm(word2))
-    #if dlDistance <= 0.2:
-    #    return 1
-    dlDistance = textdistance.damerau_levenshtein(noReflexiveForm(word1), noReflexiveForm(word2))
-    if dlDistance <= 2:
+    dlDistance = textdistance.damerau_levenshtein.normalized_distance(noReflexiveForm(word1), noReflexiveForm(word2))
+    if dlDistance <= 0.2:
         return 1
+    #dlDistance = textdistance.damerau_levenshtein(noReflexiveForm(word1), noReflexiveForm(word2))
+    #if dlDistance <= 2:
+    #    return 1
 
     return 0
 
