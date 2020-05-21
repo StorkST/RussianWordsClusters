@@ -120,11 +120,17 @@ words = [
     "бегать",
     "бежать"
 ]
+words = []
+
+with open("./intermediate") as f:
+    for line in f:
+        verb = line.strip()
+        words.append(verb)
 
 lenwords = len(words)
 
 setScores()
-prettyPrintScores()
+#prettyPrintScores()
 
 verbsWithClusters = []
 nbClusters = 0
