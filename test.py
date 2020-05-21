@@ -8,7 +8,25 @@ PREFIXES = ["у", "от", "о", "раз", "расс", "рас", "со", "с", "�
 REFLEX1 = 'ся'
 REFLEX2 = 'сь'
 
-words = ["быть", "мочь", "говорить", "сказать" ,"захотеть", "рассказывать", "рассказать"]
+words = [
+    "быть",
+    "мочь",
+    "говорить",
+    "сказать" ,
+    "захотеть",
+    "рассказывать",
+    "рассказать",
+    "кататься",
+    "катать",
+    "скатить",
+    "катить",
+    "покатиться",
+    "катиться",
+    "пробегать",
+    "пробежать",
+    "бегать",
+    "бежать"
+]
 
 # Init scores to 0
 scores = []
@@ -30,7 +48,7 @@ def noPrefix(verb):
     newForm = verb
     for prefix in PREFIXES:
         if verb.startswith(prefix):
-            return newForm[len(prefix)-1:]
+            return newForm[len(prefix):]
 
     return newForm
 
@@ -81,4 +99,5 @@ for i in range(lenwords):
     else:
         verbsWithClusters.append(currentVerb)
 
-print(str(verbsWithClusters))
+for e in verbsWithClusters:
+    print(str(e))
