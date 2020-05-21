@@ -120,7 +120,6 @@ words = [
     "бегать",
     "бежать"
 ]
-for
 
 lenwords = len(words)
 
@@ -128,12 +127,16 @@ setScores()
 prettyPrintScores()
 
 verbsWithClusters = []
+nbClusters = 0
 
 for i in range(lenwords):
     e, disabledWords = sortWords(i)
     if e != None:
         verbsWithClusters.append(e)
+        if isinstance(e, list):
+            nbClusters += 1
 
+print("Number of clusters: " + str(nbClusters))
 for e in verbsWithClusters:
     print(str(e))
 
