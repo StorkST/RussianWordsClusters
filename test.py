@@ -4,11 +4,11 @@
 #хотеть/захотеть
 #рассказывать/рассказать
 
-PREFIXES = ["у", "от", "о", "раз", "рас", "расс","со", "с", "при", "про", "проис", "пере", "под", "по", "за", "до", "на", "вы", "воз", "вз", "в", "из"]  # Usual verb prefixes
+PREFIXES = ["у", "от", "о", "раз", "расс", "рас", "со", "с", "при", "проис", "про", "пере", "под", "по", "за", "до", "недо", "на", "вы", "воз", "вз", "в", "из", "ис"]  # Usual verb prefixes
 REFLEX1 = 'ся'
 REFLEX2 = 'сь'
 
-words = ["быть", "мочь", "говорить", "казать" ,"сказать" ,"захотеть", "рассказывать", "рассказать"]
+words = ["быть", "мочь", "говорить", "сказать" ,"захотеть", "рассказывать", "рассказать"]
 
 # Init scores to 0
 scores = []
@@ -18,11 +18,36 @@ for i in range(lenwords):
     for j in range(lenwords):
         scores[i].append(0)
 
+def noReflexiveForm(verb):
+    newForm = verb
+    reflexive = (verb.endswith(REFLEX1) or verb.endswith(REFLEX2))
+
+    if reflexive:
+        return newForm[:-2]
+    return newForm
+
+def noPrefix(verb):
+    newForm = verb
+    for prefix in PREFIXES:
+        if verb.startswith(prefix):
+            return newForm[len(prefix)-1:]
+
+    return newForm
+
+def possibleStem(verb):
+    return noReflexiveForm(noPrefix(verb))
+
 def compare(word1, word2):
     if (word1 in word2) or (word2 in word1):
         return 1
-    else:
-        return 0
+
+    # if same stem
+    w1Stem = possibleStem(word1)
+    w2Stem = possibleStem(word2)
+    if (w1Stem in w2Stem) or (w2Stem in w1Stem):
+        return 0.9
+
+    return 0
 
 def setScores():
     for i in range(lenwords):
@@ -46,7 +71,7 @@ for i in range(lenwords):
     cluster = []
     for j in range(lenwords):
         score = scores[i][j]
-        if score == 1:
+        if score >= 0.9:
             matchedVerb = words[j]
             cluster.append(matchedVerb)
             disabledVerbs.append(j) # disable matchedVerb
