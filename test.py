@@ -112,7 +112,9 @@ def sortWords(i, disabledWords=[], r=1):
                     cluster.append(e)
             disabledWords.append(j) # disable matchedVerb
     if len(cluster) != 0:
-        cluster.insert(0, currentVerb)
+        if i not in disabledWords:
+            cluster.insert(0, currentVerb)
+            disabledWords.append(i)
         return cluster, disabledWords
     else:
         return currentVerb, disabledWords
