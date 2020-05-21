@@ -90,25 +90,32 @@ prettyPrintScores()
 
 verbsWithClusters = []
 disabledVerbs = []
-for i in range(lenwords):
-    if i in disabledVerbs: # skip verb if he was already clustered
-        continue
+
+def sortWords(i):
+    if i in disabledVerbs: # skip verb if she was already clustered
+        return None
 
     currentVerb = words[i]
     cluster = []
     for j in range(lenwords):
-        if j in disabledVerbs: # skip verb if he was already clustered
+        if j in disabledVerbs: # skip verb if she was already clustered
             continue
         score = scores[i][j]
-        if score >= 0.9:
+        if score == 1:
             matchedVerb = words[j]
             cluster.append(matchedVerb)
             disabledVerbs.append(j) # disable matchedVerb
     if len(cluster) != 0:
         cluster.insert(0, currentVerb)
-        verbsWithClusters.append(cluster)
+        return cluster
     else:
-        verbsWithClusters.append(currentVerb)
+        return currentVerb
+
+for i in range(lenwords):
+    e = sortWords(i)
+    if e != None:
+        verbsWithClusters.append(e)
+
 
 for e in verbsWithClusters:
     print(str(e))
