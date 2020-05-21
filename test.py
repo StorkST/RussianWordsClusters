@@ -107,12 +107,13 @@ def sortWords(i, disabledWords=[], r=1):
             if r > 0:
                 disabledWords.append(i) # To not loop on the current word
                 e, disabledWords = sortWords(j, disabledWords, 0) # recurse to merge clusters into the top one
-                if isinstance(cluster, list):
-                    cluster.extend(e)
-                else:
-                    cluster.append(e)
+                #if isinstance(cluster, list):
+                #    cluster.extend(e)
+                #else:
+                cluster.append(e)
             else:
                 cluster.append(matchedVerb)
+            #if j not in disabledWords:
             disabledWords.append(j) # disable matchedVerb
     if len(cluster) != 0:
         #if i not in disabledWords: # TODO: why need this?
