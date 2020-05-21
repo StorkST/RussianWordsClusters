@@ -26,11 +26,12 @@ def compare(word1, word2):
 
 def setScores():
     for i in range(lenwords):
-        for j in range(lenwords):
+        for j in range(i, lenwords):
             if i == j: # avoid matching one verb with itself
                 continue
             score = compare(words[i],words[j])
             scores[i][j] = score
+            scores[j][i] = score # set score the other way. => allows i in "for j in range(i, lenwords)"
 
 setScores()
 print(str(scores))
