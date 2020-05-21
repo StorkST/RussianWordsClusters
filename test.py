@@ -76,8 +76,16 @@ def setScores():
             scores[i][j] = score
             scores[j][i] = score # set score the other way. => allows i in "for j in range(i, lenwords)"
 
+def prettyPrintScores():
+    for i in range(lenwords):
+        word = words[i]
+        deepScores = "["
+        for j in range(lenwords):
+            deepScores += words[j] + " " + str(scores[i][j]) + ", "
+        print (word + ": " + deepScores[:-1] + "]")
+
 setScores()
-print(str(scores))
+prettyPrintScores()
 
 verbsWithClusters = []
 disabledVerbs = []
