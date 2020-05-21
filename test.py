@@ -97,6 +97,8 @@ for i in range(lenwords):
     currentVerb = words[i]
     cluster = []
     for j in range(lenwords):
+        if j in disabledVerbs: # skip verb if he was already clustered
+            continue
         score = scores[i][j]
         if score >= 0.9:
             matchedVerb = words[j]
