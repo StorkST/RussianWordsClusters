@@ -62,9 +62,11 @@ def compare(word1, word2):
     if (w1Stem in w2Stem) or (w2Stem in w1Stem):
         return 1
 
-    #dlDistance = textdistance.damerau_levenshtein.normalized_distance("a", "aa")
+    #dlDistance = textdistance.damerau_levenshtein.normalized_distance(noReflexiveForm(word1), noReflexiveForm(word2))
+    #if dlDistance <= 0.2:
+    #    return 1
     dlDistance = textdistance.damerau_levenshtein(noReflexiveForm(word1), noReflexiveForm(word2))
-    if dlDistance <= 1:
+    if dlDistance <= 2:
         return 1
 
     return 0
@@ -91,7 +93,7 @@ prettyPrintScores()
 
 verbsWithClusters = []
 
-def sortWords(i, disabledWords=[], r=4):
+def sortWords(i, disabledWords=[], r=3):
     if i in disabledWords: # skip verb if she was already clustered
         return None, disabledWords
 
@@ -108,10 +110,10 @@ def sortWords(i, disabledWords=[], r=4):
                 r = r - 1
                 disabledWords.append(i) # To not loop on the current word
                 e, disabledWords = sortWords(j, disabledWords, r) # recurse to merge clusters into the top one
-                #if isinstance(cluster, list):
-                #    cluster.extend(e)
-                #else:
-                cluster.append(e)
+                if isinstance(e, list):
+                    cluster.extend(e)
+                else:
+                    cluster.append(e)
             else:
                 cluster.append(matchedVerb)
             #if j not in disabledWords:
@@ -127,7 +129,6 @@ for i in range(lenwords):
     e, disabledWords  = sortWords(i)
     if e != None:
         verbsWithClusters.append(e)
-
 
 for e in verbsWithClusters:
     print(str(e))
