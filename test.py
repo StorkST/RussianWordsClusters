@@ -91,7 +91,7 @@ prettyPrintScores()
 
 verbsWithClusters = []
 
-def sortWords(i, disabledWords=[], r=1):
+def sortWords(i, disabledWords=[], r=4):
     if i in disabledWords: # skip verb if she was already clustered
         return None, disabledWords
 
@@ -105,8 +105,9 @@ def sortWords(i, disabledWords=[], r=1):
         if score == 1:
             matchedVerb = words[j]
             if r > 0:
+                r = r - 1
                 disabledWords.append(i) # To not loop on the current word
-                e, disabledWords = sortWords(j, disabledWords, 0) # recurse to merge clusters into the top one
+                e, disabledWords = sortWords(j, disabledWords, r) # recurse to merge clusters into the top one
                 #if isinstance(cluster, list):
                 #    cluster.extend(e)
                 #else:
