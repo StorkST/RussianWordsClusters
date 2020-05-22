@@ -1,6 +1,7 @@
 import textdistance
 import types
 
+VOWELS = ["а", "у", "о", "ы", "и", "э", "я", "ю", "ё", "е"]
 PREFIXES = ["у", "от", "о", "раз", "расс", "рас", "со", "с", "при", "проис", "про", "пере", "под", "по", "за", "до", "недо", "на", "вы", "воз", "вз", "в", "из", "ис"]  # Usual verb prefixes
 REFLEX1 = 'ся'
 REFLEX2 = 'сь'
@@ -34,8 +35,21 @@ def compare(word1, word2):
     # if same stem
     w1Stem = possibleStem(word1)
     w2Stem = possibleStem(word2)
-    if (w1Stem in w2Stem) or (w2Stem in w1Stem):
+    # if (w1Stem in w2Stem) or (w2Stem in w1Stem):
+    if (w1Stem == w2Stem):
         return 1
+
+    cpm1 = noReflexiveForm(word1)
+    cpm2 = noReflexiveForm(word2)
+    if (len(cpm1) == len(cpm2)):
+        diffs = [i for i in range(len(cpm1)) if cpm1[i] != cpm2[i]]
+        if len(diffs) == 1:  # Accept only one transformation on a vowel
+            i = diffs[0]
+            w1Letter = cpm1[i]
+            w2Letter = cpm2[i]
+            if (w1Letter in VOWELS) and (w2Letter in VOWELS):
+                print("MATCHED STEMS WITH VOWELS: " + cpm1 + " AND " + cpm2)
+                return 1
 
     #dlDistance = textdistance.damerau_levenshtein.normalized_distance(noReflexiveForm(word1), noReflexiveForm(word2))
     #if dlDistance <= 0.15:
