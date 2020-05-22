@@ -37,12 +37,12 @@ def compare(word1, word2):
     if (w1Stem in w2Stem) or (w2Stem in w1Stem):
         return 1
 
-    dlDistance = textdistance.damerau_levenshtein.normalized_distance(noReflexiveForm(word1), noReflexiveForm(word2))
-    if dlDistance <= 0.2:
-        return 1
-    #dlDistance = textdistance.damerau_levenshtein(noReflexiveForm(word1), noReflexiveForm(word2))
-    #if dlDistance <= 2:
+    #dlDistance = textdistance.damerau_levenshtein.normalized_distance(noReflexiveForm(word1), noReflexiveForm(word2))
+    #if dlDistance <= 0.15:
     #    return 1
+    dlDistance = textdistance.damerau_levenshtein(noReflexiveForm(word1), noReflexiveForm(word2))
+    if dlDistance <= 2:
+        return 1
 
     return 0
 
@@ -69,7 +69,7 @@ def prettyPrintScores():
             deepScores += words[j] + " " + str(scores[i][j]) + ", "
         print (word + ": " + deepScores[:-1] + "]")
 
-def sortWords(i, disabledWords=[], r=3):
+def sortWords(i, disabledWords=[], r=1):
     if i in disabledWords: # skip verb if she was already clustered
         return None, disabledWords
 
