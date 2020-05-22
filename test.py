@@ -1,7 +1,18 @@
 import textdistance
 import types
 
-VOWELS = ["а", "у", "о", "ы", "и", "э", "я", "ю", "ё", "е"]
+VOWELS = ['а', 'у', 'о', 'ы', 'и', 'э', 'я', 'ю', 'ё', 'е']
+CONSONANT_MUTATIONS = [ # https://en.wikipedia.org/wiki/Consonant_mutation#Russian
+    ['к', 'ч'],
+    ['г', 'ж'],
+    ['х', 'ш'],
+    ['т', 'ч'],
+    ['д', 'ж'],
+    ['з', 'ж'],
+    ['с', 'ш'],
+    ['ц', 'ч']
+]
+
 PREFIXES = ["у", "от", "о", "раз", "расс", "рас", "со", "с", "при", "проис", "про", "пере", "под", "по", "за", "до", "недо", "на", "вы", "воз", "вз", "в", "из", "ис"]  # Usual verb prefixes
 REFLEX1 = 'ся'
 REFLEX2 = 'сь'
@@ -29,8 +40,11 @@ def possibleStem(verb):
     return noReflexiveForm(noPrefix(verb))
 
 def compare(word1, word2):
-    if (word1 in word2) or (word2 in word1):
-        return 1
+    # Disable this part?
+    w1NoReflex = noReflexiveForm(word1)
+    w2NoReflex = noReflexiveForm(word2)
+    #if (w1NoReflex in w2NoReflex) or (w2NoReflex in w1NoReflex):
+    #    return 1
 
     # if same stem
     w1Stem = possibleStem(word1)
@@ -39,6 +53,7 @@ def compare(word1, word2):
     if (w1Stem == w2Stem):
         return 1
 
+    # With stem?
     cpm1 = noReflexiveForm(word1)
     cpm2 = noReflexiveForm(word2)
     if (len(cpm1) == len(cpm2)):
@@ -50,6 +65,10 @@ def compare(word1, word2):
             if (w1Letter in VOWELS) and (w2Letter in VOWELS):
                 print("MATCHED STEMS WITH VOWELS: " + cpm1 + " AND " + cpm2)
                 return 1
+            for pair in CONSONANT_MUTATIONS:
+                if (w1Letter in pair) and (w2Letter in pair):
+                    print("MATCHED CONSONANTS: " + cpm1 + " AND " + cpm2)
+                    return 1
 
     #dlDistance = textdistance.damerau_levenshtein.normalized_distance(noReflexiveForm(word1), noReflexiveForm(word2))
     #if dlDistance <= 0.15:
@@ -83,7 +102,7 @@ def prettyPrintScores():
             deepScores += words[j] + " " + str(scores[i][j]) + ", "
         print (word + ": " + deepScores[:-1] + "]")
 
-def sortWords(i, disabledWords=[], r=3):
+def sortWords(i, disabledWords=[], r=1):
     if i in disabledWords: # skip verb if she was already clustered
         return None, disabledWords
 
