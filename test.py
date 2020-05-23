@@ -20,6 +20,26 @@ REFLEX2 = 'сь'
 words = []
 scores = []
 
+def endsWithVowel(word):
+    for v in VOWELS:
+        if word.endswith(v):
+            return True
+    return False
+
+def isReflexive(word):
+    return (verb.endswith(REFLEX1) or verb.endswith(REFLEX2))
+
+def reflexiveForm(verb):
+    newForm = verb
+    reflexive = isReflexive(verb)
+
+    if not reflexive:
+        if endsWithVowel(verb):
+           newForm += REFLEX2
+        else:
+           newForm += REFLEX1
+    return newForm
+
 def noReflexiveForm(verb):
     newForm = verb
     reflexive = (verb.endswith(REFLEX1) or verb.endswith(REFLEX2))
@@ -102,7 +122,7 @@ def prettyPrintScores():
             deepScores += words[j] + " " + str(scores[i][j]) + ", "
         print (word + ": " + deepScores[:-1] + "]")
 
-def sortWords(i, disabledWords=[], r=1):
+def sortWords(i, disabledWords=[], r=3):
     if i in disabledWords: # skip verb if she was already clustered
         return None, disabledWords
 
@@ -171,9 +191,38 @@ nbClusters = 0
 for i in range(lenwords):
     e, disabledWords = sortWords(i)
     if e != None:
-        verbsWithClusters.append(e)
-        if isinstance(e, list):
-            nbClusters += 1
+        if isinstance(e, str):
+            verbsWithClusters.append(e)
+            continue
+
+        assert isinstance(e, list)
+        # Order verbs in cluster
+        # Shorter first
+        # Then reflexive form after its original form (if reflexive available)
+        freqCluster = e
+        newCluster = []
+        nbClusters += 1
+
+        head = min(freqCluster, key=len)
+        subHead = reflexiveForm(head) if isReflexive(head) else ""
+        newCluster.append(head)
+        if (subHead != "" and subHead in freqCluster):
+            newCluster.append(subHead)
+
+        for word in sorted(freqCluster):
+            if word not in newCluster:
+                if isReflexive(word):
+                    headWord = noReflexiveForm(word)
+                    if headWord in freqCluster:
+                        newCluster.append(headWord)
+                    newCluster.append(word)
+                else:
+                    newCluster.append(word)
+                    subWord = reflexiveForm(word)
+                    if subWord in freqCluster:
+                        newCluster.append(subWord)
+
+        verbsWithClusters.append(newCluster)
 
 print("Number of clusters: " + str(nbClusters))
 for e in verbsWithClusters:
