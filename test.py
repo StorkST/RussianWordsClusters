@@ -13,13 +13,13 @@ CONSONANT_MUTATIONS = [ # https://en.wikipedia.org/wiki/Consonant_mutation#Russi
     ['ц', 'ч']
 ]
 
-PREFIXES = ["у", "от", "о", "раз", "расс", "рас", "со", "с", "при", "проис", "про", "пере", "под", "по", "за", "до", "недо", "на", "вы", "воз", "вз", "в", "из", "ис"]  # Usual verb prefixes
+PREFIXES = ["у", "от", "о", "раз", "расс", "рас", "со", "с", "при", "проис", "про", "пере", "подъ", "под", "по", "за", "до", "недо", "на", "вы", "воз", "вз", "въ", "в", "из", "ис"]  # Usual verb prefixes
 REFLEX1 = 'ся'
 REFLEX2 = 'сь'
 
 words = []
-
 scores = []
+
 def noReflexiveForm(verb):
     newForm = verb
     reflexive = (verb.endswith(REFLEX1) or verb.endswith(REFLEX2))
@@ -155,7 +155,7 @@ words = [
 ]
 words = []
 
-with open("./intermediate") as f:
+with open("./beginners") as f:
     for line in f:
         verb = line.strip()
         words.append(verb)
