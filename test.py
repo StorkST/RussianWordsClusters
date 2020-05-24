@@ -175,7 +175,7 @@ words = [
 ]
 words = []
 
-with open("./beginners") as f:
+with open("./advanced") as f:
     for line in f:
         verb = line.strip()
         words.append(verb)
