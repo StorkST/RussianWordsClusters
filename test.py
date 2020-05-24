@@ -175,7 +175,7 @@ words = [
 ]
 words = []
 
-with open("./advanced") as f:
+with open("./intermediate") as f:
     for line in f:
         verb = line.strip()
         words.append(verb)
@@ -203,24 +203,30 @@ for i in range(lenwords):
         newCluster = []
         nbClusters += 1
 
+        print (str(newCluster))
         head = min(freqCluster, key=len)
-        subHead = reflexiveForm(head) if isReflexive(head) else ""
         newCluster.append(head)
-        if (subHead != "" and subHead in freqCluster):
-            newCluster.append(subHead)
+
+        if not isReflexive(head):
+            subHead = reflexiveForm(head)
+            if subHead in freqCluster:
+                newCluster.append(subHead)
+        print (str(newCluster))
 
         for word in sorted(freqCluster):
-            if word not in newCluster:
-                if isReflexive(word):
-                    headWord = noReflexiveForm(word)
-                    if headWord in freqCluster:
-                        newCluster.append(headWord)
+            print ("newCluster: " + str(newCluster))
+            if isReflexive(word):
+                headWord = noReflexiveForm(word)
+                if headWord in freqCluster and headWord not in newCluster:
+                    newCluster.append(headWord)
+                if word not in newCluster:
                     newCluster.append(word)
-                else:
+            else:
+                if word not in newCluster:
                     newCluster.append(word)
-                    subWord = reflexiveForm(word)
-                    if subWord in freqCluster:
-                        newCluster.append(subWord)
+                subWord = reflexiveForm(word)
+                if subWord in freqCluster and subWord not in newCluster:
+                    newCluster.append(subWord)
 
         verbsWithClusters.append(newCluster)
 
