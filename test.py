@@ -154,6 +154,21 @@ def sortWords(i, disabledWords=[], r=3):
     else:
         return currentVerb, disabledWords
 
+# Returns the first word without a prefix
+# If no word can be found without a prefix, returns the first word from the list
+def noPrefixWord(array):
+    assert (len(array) >= 1)
+
+    for word in array:
+        hasPrefix = False
+        for prefix in PREFIXES:
+            if word.startswith(prefix):
+                hasPrefix = hasPrefix or True
+        if not hasPrefix:
+            return word
+
+    return array[0]
+
 words = [
     "быть",
     "мочь",
@@ -204,7 +219,7 @@ for i in range(lenwords):
         nbClusters += 1
 
         print (str(newCluster))
-        head = min(freqCluster, key=len)
+        head = noPrefixWord(freqCluster)
         newCluster.append(head)
 
         if not isReflexive(head):
