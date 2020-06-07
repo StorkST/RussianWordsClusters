@@ -32,11 +32,13 @@ def assertArraysEqual(arr1, arr2):
 def test_cluster_in_out(input, output):
     def test():
         words_in = getWords(input)
+        oracle = getWords(output)
         russianClusters = rwc(words_in)
 
         words_out = rwc.flatten(russianClusters.getWordsAndClusters())
-
-        assertArraysEqual(words_in, words_out)
+        print(str(words_out))
+        print(str(oracle))
+        assertArraysEqual(words_out, oracle)
     return test
 
 if __name__ == '__main__':
@@ -49,7 +51,6 @@ if __name__ == '__main__':
         if i % 2 == 1:
             del test_cases[i-nbDel]
             nbDel += 1
-    print (str(test_cases))
 
     for case in test_cases:
         input = case
