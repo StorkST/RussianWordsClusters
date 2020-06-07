@@ -20,6 +20,7 @@ REFLEX1 = 'ся'
 REFLEX2 = 'сь'
 
 words = []
+lenwords = 0
 scores = []
 
 def endsWithVowel(word):
@@ -172,8 +173,23 @@ def noPrefixWord(array):
 
     return array[0]
 
+def flatten(wordsWithClusters):
+    flat = []
+    for e in wordsWithClusters:
+        if isinstance(e, str):
+            flat.append(e)
+        else: # isinstance(e, list)
+            flat.extend(e)
+
+    return flat
+
+
 def orderWithClusters(wordsArray):
-    wordsWithClusters = [] # Elements will contain either a String or an Array
+    lenwords = len(words)
+    setScores()
+
+    #prettyPrintScores()
+    wordsWithClusters = [] # Elements in this variable will contain either a String or an Array
     nbClusters = 0
 
     for i in range(lenwords):
@@ -225,10 +241,6 @@ if __name__ == '__main__':
         for line in f:
             verb = line.strip()
             words.append(verb)
-    lenwords = len(words)
-
-    setScores()
-    #prettyPrintScores()
 
     wordsWithClusters = orderWithClusters(words)
 
