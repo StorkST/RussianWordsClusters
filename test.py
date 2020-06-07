@@ -3,8 +3,13 @@ from pathlib import Path
 import sys
 import unittest
 import glob
+import cluster
 
-PATH_TESTS = "./tests/*[!oracle]"
+#import importlib
+#moduleName = input('cluster')
+#importlib.import_module(moduleName)
+
+PATH_TESTS = "./tests/*[!-oracle]"
 
 def test_cluster_in_out(input, output):
     def test():
