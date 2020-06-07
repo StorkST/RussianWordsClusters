@@ -38,41 +38,41 @@ class RussianWordsClusters:
 
     @staticmethod
     def isReflexive(word):
-        return (verb.endswith(RussianWordsClusters.REFLEX1) or verb.endswith(RussianWordsClusters.REFLEX2))
+        return (word.endswith(RussianWordsClusters.REFLEX1) or word.endswith(RussianWordsClusters.REFLEX2))
 
     @staticmethod
-    def reflexiveForm(verb):
-        newForm = verb
-        reflexive = RussianWordsClusters.isReflexive(verb)
+    def reflexiveForm(word):
+        newForm = word
+        reflexive = RussianWordsClusters.isReflexive(word)
 
         if not reflexive:
-            if RussianWordsClusters.endsWithVowel(verb):
+            if RussianWordsClusters.endsWithVowel(word):
                newForm += RussianWordsClusters.REFLEX2
             else:
                newForm += RussianWordsClusters.REFLEX1
         return newForm
 
     @staticmethod
-    def noReflexiveForm(verb):
-        newForm = verb
-        reflexive = (verb.endswith(RussianWordsClusters.REFLEX1) or verb.endswith(RussianWordsClusters.REFLEX2))
+    def noReflexiveForm(word):
+        newForm = word
+        reflexive = (word.endswith(RussianWordsClusters.REFLEX1) or word.endswith(RussianWordsClusters.REFLEX2))
 
         if reflexive:
             return newForm[:-2]
         return newForm
 
     @staticmethod
-    def noPrefix(verb):
-        newForm = verb
+    def noPrefix(word):
+        newForm = word
         for prefix in RussianWordsClusters.PREFIXES:
-            if verb.startswith(prefix):
+            if word.startswith(prefix):
                 return newForm[len(prefix):]
 
         return newForm
 
     @staticmethod
-    def possibleStem(verb):
-        return RussianWordsClusters.noReflexiveForm(RussianWordsClusters.noPrefix(verb))
+    def possibleStem(word):
+        return RussianWordsClusters.noReflexiveForm(RussianWordsClusters.noPrefix(word))
 
     @staticmethod
     def compare(word1, word2):
@@ -143,7 +143,7 @@ class RussianWordsClusters:
         if i in disabledWords: # skip verb if she was already clustered
             return None, disabledWords
 
-        currentVerb = self.words[i]
+        currentWord = self.words[i]
         cluster = []
         for j in range(self.lenwords):
             if j in disabledWords: # skip verb if she was already clustered
@@ -151,7 +151,7 @@ class RussianWordsClusters:
 
             score = self.scores[i][j]
             if score == 1:
-                matchedVerb = self.words[j]
+                matchedWord = self.words[j]
                 if r > 0:
                     r = r - 1
                     disabledWords.append(i) # To not loop on the current word
@@ -161,15 +161,15 @@ class RussianWordsClusters:
                     else:
                         cluster.append(e)
                 else:
-                    cluster.append(matchedVerb)
+                    cluster.append(matchedWord)
                 #if j not in disabledWords:
-                disabledWords.append(j) # disable matchedVerb
+                disabledWords.append(j) # disable matchedWord
         if len(cluster) != 0:
             #if i not in disabledWords: # TODO: why need this?
-            cluster.insert(0, currentVerb)
+            cluster.insert(0, currentWord)
             return cluster, disabledWords
         else:
-            return currentVerb, disabledWords
+            return currentWord, disabledWords
 
     # Returns the first word without a prefix
     # If no word can be found without a prefix, returns the first word from the list
@@ -198,7 +198,7 @@ class RussianWordsClusters:
 
         return flat
 
-    def orderWithClusters(self):
+    def getWordsAndClusters(self):
         wordsWithClusters = [] # Elements in this variable will contain either a String or an Array
         nbClusters = 0
 
@@ -230,7 +230,7 @@ class RussianWordsClusters:
                 for word in sorted(freqCluster):
                     #print ("newCluster: " + str(newCluster))
                     if RussianWordsClusters.isReflexive(word):
-                        headWord = noReflexiveForm(word)
+                        headWord = RussianWordsClusters.noReflexiveForm(word)
                         if headWord in freqCluster and headWord not in newCluster:
                             newCluster.append(headWord)
                         if word not in newCluster:
@@ -250,11 +250,11 @@ if __name__ == '__main__':
     words = []
     with open("./advanced") as f:
         for line in f:
-            verb = line.strip()
-            words.append(verb)
+            word = line.strip()
+            words.append(word)
 
     rwc = RussianWordsClusters(words)
-    wordsWithClusters = rwc.orderWithClusters()
+    wordsWithClusters = rwc.getWordsAndClusters()
 
     for e in wordsWithClusters:
         print(str(e))
