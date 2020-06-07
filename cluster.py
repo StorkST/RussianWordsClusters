@@ -74,7 +74,7 @@ def compare(word1, word2):
     if (w1Stem == w2Stem):
         return 1
 
-    # With stem?
+    # Find probable transformation of consonants of vowels
     cpm1 = noReflexiveForm(word1)
     cpm2 = noReflexiveForm(word2)
     if (len(cpm1) == len(cpm2)):
