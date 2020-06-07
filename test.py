@@ -20,7 +20,8 @@ def getWords(input):
 
 def assertArraysEqual(arr1, arr2):
     lenarr1 = len(arr1)
-    assert lenarr1 == len(arr2)
+    lenarr2 = len(arr2)
+    assert lenarr1 == len(arr2), 'assert false between {0} and {1}'.format(str(lenarr1), str(lenarr2))
 
     for i in range(lenarr1):
         e1 = arr1[i]
