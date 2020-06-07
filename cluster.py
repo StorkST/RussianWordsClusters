@@ -124,6 +124,7 @@ def prettyPrintScores():
             deepScores += words[j] + " " + str(scores[i][j]) + ", "
         print (word + ": " + deepScores[:-1] + "]")
 
+# Returns words matching with word=words[i] and with CRITERIA
 def sortWords(i, disabledWords=[], r=3):
     if i in disabledWords: # skip verb if she was already clustered
         return None, disabledWords
@@ -171,37 +172,26 @@ def noPrefixWord(array):
 
     return array[0]
 
-
-if __name__ == '__main__':
-    with open("./advanced") as f:
-        for line in f:
-            verb = line.strip()
-            words.append(verb)
-
-    lenwords = len(words)
-
-    setScores()
-#prettyPrintScores()
-
-    verbsWithClusters = []
+def orderWithClusters(wordsArray):
+    wordsWithClusters = [] # Elements will contain either a String or an Array
     nbClusters = 0
 
     for i in range(lenwords):
         e, disabledWords = sortWords(i)
         if e != None:
             if isinstance(e, str):
-                verbsWithClusters.append(e)
+                wordsWithClusters.append(e)
                 continue
 
             assert isinstance(e, list)
-            # Order verbs in cluster
+            # Order words in cluster
             # Shorter first
             # Then reflexive form after its original form (if reflexive available)
             freqCluster = e
             newCluster = []
             nbClusters += 1
 
-            print (str(newCluster))
+            #print (str(newCluster))
             head = noPrefixWord(freqCluster)
             newCluster.append(head)
 
@@ -209,10 +199,10 @@ if __name__ == '__main__':
                 subHead = reflexiveForm(head)
                 if subHead in freqCluster:
                     newCluster.append(subHead)
-            print (str(newCluster))
+            #print (str(newCluster))
 
             for word in sorted(freqCluster):
-                print ("newCluster: " + str(newCluster))
+                #print ("newCluster: " + str(newCluster))
                 if isReflexive(word):
                     headWord = noReflexiveForm(word)
                     if headWord in freqCluster and headWord not in newCluster:
@@ -226,8 +216,21 @@ if __name__ == '__main__':
                     if subWord in freqCluster and subWord not in newCluster:
                         newCluster.append(subWord)
 
-            verbsWithClusters.append(newCluster)
+            wordsWithClusters.append(newCluster)
 
-    print("Number of clusters: " + str(nbClusters))
-    for e in verbsWithClusters:
+    return wordsWithClusters
+
+if __name__ == '__main__':
+    with open("./advanced") as f:
+        for line in f:
+            verb = line.strip()
+            words.append(verb)
+    lenwords = len(words)
+
+    setScores()
+    #prettyPrintScores()
+
+    wordsWithClusters = orderWithClusters(words)
+
+    for e in wordsWithClusters:
         print(str(e))
