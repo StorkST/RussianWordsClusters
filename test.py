@@ -5,7 +5,8 @@ import unittest
 import glob
 from cluster import RussianWordsClusters as rwc
 
-PATH_TESTS = "./tests/*[!-oracle]"
+#PATH_TESTS = './tests/!(*oracle)' # Somehow it doesn't work
+PATH_TESTS = "./tests/*"
 
 def getWords(input):
     words = []
@@ -41,6 +42,14 @@ def test_cluster_in_out(input, output):
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     test_cases = glob.glob(PATH_TESTS)
+    test_cases.sort()
+
+    nbDel = 0
+    for i in range(len(test_cases)): # Hack because can't make glob work as wanted
+        if i % 2 == 1:
+            del test_cases[i-nbDel]
+            nbDel += 1
+    print (str(test_cases))
 
     for case in test_cases:
         input = case
