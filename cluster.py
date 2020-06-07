@@ -14,7 +14,8 @@ CONSONANT_MUTATIONS = [ # https://en.wikipedia.org/wiki/Consonant_mutation#Russi
     ['ц', 'ч']
 ]
 
-PREFIXES = ["у", "от", "о", "раз", "расс", "рас", "со", "с", "при", "проис", "про", "пере", "подъ", "под", "по", "за", "до", "недо", "на", "вы", "воз", "вз", "въ", "в", "из", "ис"]  # Usual verb prefixes
+PREFIXES = ["у", "от", "о", "раз", "расс", "рас", "со", "с", "при", "проис", "про", "пере", "подъ", "под", "по",
+        "за", "до", "недо", "на", "вы", "воз", "вз", "въ", "в", "из", "ис"]  # Usual verb prefixes
 REFLEX1 = 'ся'
 REFLEX2 = 'сь'
 
@@ -170,83 +171,63 @@ def noPrefixWord(array):
 
     return array[0]
 
-words = [
-    "быть",
-    "мочь",
-    "говорить",
-    "сказать" ,
-    "захотеть",
-    "рассказывать",
-    "рассказать",
-    "кататься",
-    "катать",
-    "скатить",
-    "катить",
-    "покатиться",
-    "катиться",
-    "пробегать",
-    "пробежать",
-    "бегать",
-    "бежать"
-]
-words = []
 
-with open("./advanced") as f:
-    for line in f:
-        verb = line.strip()
-        words.append(verb)
+if __name__ == '__main__':
+    with open("./advanced") as f:
+        for line in f:
+            verb = line.strip()
+            words.append(verb)
 
-lenwords = len(words)
+    lenwords = len(words)
 
-setScores()
+    setScores()
 #prettyPrintScores()
 
-verbsWithClusters = []
-nbClusters = 0
+    verbsWithClusters = []
+    nbClusters = 0
 
-for i in range(lenwords):
-    e, disabledWords = sortWords(i)
-    if e != None:
-        if isinstance(e, str):
-            verbsWithClusters.append(e)
-            continue
+    for i in range(lenwords):
+        e, disabledWords = sortWords(i)
+        if e != None:
+            if isinstance(e, str):
+                verbsWithClusters.append(e)
+                continue
 
-        assert isinstance(e, list)
-        # Order verbs in cluster
-        # Shorter first
-        # Then reflexive form after its original form (if reflexive available)
-        freqCluster = e
-        newCluster = []
-        nbClusters += 1
+            assert isinstance(e, list)
+            # Order verbs in cluster
+            # Shorter first
+            # Then reflexive form after its original form (if reflexive available)
+            freqCluster = e
+            newCluster = []
+            nbClusters += 1
 
-        print (str(newCluster))
-        head = noPrefixWord(freqCluster)
-        newCluster.append(head)
+            print (str(newCluster))
+            head = noPrefixWord(freqCluster)
+            newCluster.append(head)
 
-        if not isReflexive(head):
-            subHead = reflexiveForm(head)
-            if subHead in freqCluster:
-                newCluster.append(subHead)
-        print (str(newCluster))
+            if not isReflexive(head):
+                subHead = reflexiveForm(head)
+                if subHead in freqCluster:
+                    newCluster.append(subHead)
+            print (str(newCluster))
 
-        for word in sorted(freqCluster):
-            print ("newCluster: " + str(newCluster))
-            if isReflexive(word):
-                headWord = noReflexiveForm(word)
-                if headWord in freqCluster and headWord not in newCluster:
-                    newCluster.append(headWord)
-                if word not in newCluster:
-                    newCluster.append(word)
-            else:
-                if word not in newCluster:
-                    newCluster.append(word)
-                subWord = reflexiveForm(word)
-                if subWord in freqCluster and subWord not in newCluster:
-                    newCluster.append(subWord)
+            for word in sorted(freqCluster):
+                print ("newCluster: " + str(newCluster))
+                if isReflexive(word):
+                    headWord = noReflexiveForm(word)
+                    if headWord in freqCluster and headWord not in newCluster:
+                        newCluster.append(headWord)
+                    if word not in newCluster:
+                        newCluster.append(word)
+                else:
+                    if word not in newCluster:
+                        newCluster.append(word)
+                    subWord = reflexiveForm(word)
+                    if subWord in freqCluster and subWord not in newCluster:
+                        newCluster.append(subWord)
 
-        verbsWithClusters.append(newCluster)
+            verbsWithClusters.append(newCluster)
 
-print("Number of clusters: " + str(nbClusters))
-for e in verbsWithClusters:
-    print(str(e))
-
+    print("Number of clusters: " + str(nbClusters))
+    for e in verbsWithClusters:
+        print(str(e))
