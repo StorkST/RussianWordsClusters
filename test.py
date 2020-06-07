@@ -3,7 +3,7 @@ from pathlib import Path
 import sys
 import unittest
 import glob
-import cluster
+from cluster import RussianWordsClusters as rwc
 
 PATH_TESTS = "./tests/*[!-oracle]"
 
@@ -26,12 +26,15 @@ def assertArraysEqual(arr1, arr2):
     for i in range(lenarr1):
         e1 = arr1[i]
         e2 = arr2[i]
-        assert e1 == e2, "error"
+        assert e1 == e2, 'assert false between {0} and {1}'.format(str(e1), str(e2))
 
 def test_cluster_in_out(input, output):
     def test():
         words_in = getWords(input)
-        words_out = cluster.flatten(cluster.orderWithClusters(words_in))
+        russianClusters = rwc(words_in)
+
+        words_out = rwc.flatten(russianClusters.getWordsAndClusters())
+
         assertArraysEqual(words_in, words_out)
     return test
 

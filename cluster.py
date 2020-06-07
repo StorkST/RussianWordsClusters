@@ -99,11 +99,11 @@ class RussianWordsClusters:
                 w1Letter = cpm1[i]
                 w2Letter = cpm2[i]
                 if (w1Letter in RussianWordsClusters.VOWELS) and (w2Letter in RussianWordsClusters.VOWELS):
-                    print("MATCHED STEMS WITH VOWELS: " + cpm1 + " AND " + cpm2)
+                    #print("MATCHED STEMS WITH VOWELS: " + cpm1 + " AND " + cpm2)
                     return 1
                 for pair in RussianWordsClusters.CONSONANT_MUTATIONS:
                     if (w1Letter in pair) and (w2Letter in pair):
-                        print("MATCHED CONSONANTS: " + cpm1 + " AND " + cpm2)
+                        #print("MATCHED CONSONANTS: " + cpm1 + " AND " + cpm2)
                         return 1
 
         #dlDistance = textdistance.damerau_levenshtein.normalized_distance(noReflexiveForm(word1), noReflexiveForm(word2))
