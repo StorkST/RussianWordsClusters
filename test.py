@@ -22,7 +22,7 @@ def getWords(input):
 def assertArraysEqual(arr1, arr2):
     lenarr1 = len(arr1)
     lenarr2 = len(arr2)
-    assert lenarr1 == len(arr2), 'assert false between {0} and {1}'.format(str(lenarr1), str(lenarr2))
+    assert lenarr1 == len(arr2), 'assert false between {0} and {1}:\n  size {0}: {2}\n  size {1}: {3}'.format(str(lenarr1), str(lenarr2), str(arr1), str(arr2))
 
     for i in range(lenarr1):
         e1 = arr1[i]
@@ -36,8 +36,6 @@ def test_cluster_in_out(input, output):
         russianClusters = rwc(words_in)
 
         words_out = rwc.flatten(russianClusters.getWordsAndClusters())
-        print(str(words_out))
-        print(str(oracle))
         assertArraysEqual(words_out, oracle)
     return test
 
