@@ -24,9 +24,13 @@ class RussianWordsClusters:
     lenwords = 0
     scores = []
 
-    def __init__(self, words):
-        self.words = words
-        self.lenwords = len(words)
+    def __init__(self, newWords):
+        self.words = []
+        self.lenwords = 0
+        self.scores = []
+
+        self.words = newWords
+        self.lenwords = len(newWords)
         self.setScores()
 
     @staticmethod
@@ -140,6 +144,7 @@ class RussianWordsClusters:
 
     # Returns words matching with word=words[i] and with CRITERIA
     def sortWords(self, i, disabledWords=[], r=3):
+        print("disabled: " + str(disabledWords))
         if i in disabledWords: # skip verb if she was already clustered
             return None, disabledWords
 
@@ -202,8 +207,13 @@ class RussianWordsClusters:
         wordsWithClusters = [] # Elements in this variable will contain either a String or an Array
         nbClusters = 0
 
+        print(self.words)
+        self.prettyPrintScores()
+        print("size of words: " + str(self.lenwords))
+
+        disabledWords = []
         for i in range(self.lenwords):
-            e, disabledWords = self.sortWords(i)
+            e, disabledWords = self.sortWords(i, disabledWords, 3) # Specify defaults arguments to avoid bug when getWordsAndClusters is called multiple times on a unique instance of class
             if e != None:
                 if isinstance(e, str):
                     wordsWithClusters.append(e)
@@ -217,7 +227,7 @@ class RussianWordsClusters:
                 newCluster = []
                 nbClusters += 1
 
-                #print (str(newCluster))
+                print (str(newCluster))
                 head = RussianWordsClusters.noPrefixWord(freqCluster)
                 newCluster.append(head)
 
@@ -225,10 +235,10 @@ class RussianWordsClusters:
                     subHead = RussianWordsClusters.reflexiveForm(head)
                     if subHead in freqCluster:
                         newCluster.append(subHead)
-                #print (str(newCluster))
+                print (str(newCluster))
 
                 for word in sorted(freqCluster):
-                    #print ("newCluster: " + str(newCluster))
+                    print ("newCluster: " + str(newCluster))
                     if RussianWordsClusters.isReflexive(word):
                         headWord = RussianWordsClusters.noReflexiveForm(word)
                         if headWord in freqCluster and headWord not in newCluster:
