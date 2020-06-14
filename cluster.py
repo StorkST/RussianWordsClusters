@@ -36,7 +36,7 @@ class RussianWordsClusters:
         ['ц', 'ч']
     ]
 
-    PREFIXES = ["у", "от", "о", "раз", "расс", "рас", "со", "с", "при", "проис", "про", "пере", "подъ", "под", "по",
+    PREFIXES = ["у", "от", "о", "раз", "расс", "рас", "со", "с", "при", "проис", "про", "пре", "пере", "подъ", "под", "по",
             "за", "до", "недо", "на", "вы", "воз", "вз", "въ", "в", "из", "ис"]  # Usual verb prefixes
     REFLEX1 = 'ся'
     REFLEX2 = 'сь'
@@ -179,11 +179,13 @@ class RussianWordsClusters:
 
     # Returns words that match (criteria) with word of value words[i]
     # Returns word of value words[i] if no match was found
-    def groupBy(self, criteria, wordsWithClusters, disabledWords=[], r=3):
+    def groupBy(self, criteria, wordsWithClusters, disabledWords=[]):#, r=3):
         for i in range(self.lenwords):
             if i in disabledWords: # skip verb if she was already clustered
-                return wordsWithClusters, disabledWords
+                continue
             currentWord = self.words[i]
+            if currentWord == "творить":
+                print("currentWord: творить!!")
 
             for j in range(self.lenwords):
                 if j in disabledWords: # skip verb if she was already clustered
@@ -194,26 +196,28 @@ class RussianWordsClusters:
                     continue
                 if link & criteria:
                     matchedWord = self.words[j]
-                    if r > 0:
-                        r = r - 1
-                        disabledWords.append(i) # To not loop on the current word
-                        wordsWithClusters, disabledWords = self.groupBy(criteria, wordsWithClusters, disabledWords, r) # recurse to merge deep clusters into the top one
+                    if matchedWord == "творить":
+                        print("matchedWord: творить!!!")
+                    #if r > 0:
+                    #    r = r - 1
+                    #    disabledWords.append(i) # To not loop on the current word
+                    #    wordsWithClusters, disabledWords = self.groupBy(criteria, wordsWithClusters, disabledWords, r) # recurse to merge deep clusters into the top one
 
-                    wordsWithClusters[j].remove(matchedWord)
                     wordsWithClusters[i].append(matchedWord)
+                    wordsWithClusters[j].remove(matchedWord)
                     disabledWords.append(j) # disable matchedWord
 
-            return wordsWithClusters, disabledWords
+        return wordsWithClusters, disabledWords
 
     def getWordsAndClusters(self, clusteringPriorities):
-        self.prettyPrintLinks()
+        #self.prettyPrintLinks()
         wordsWithClusters = []
         for word in self.words:
             wordsWithClusters.append([word])
         disabledWords = []
 
         for criteria in clusteringPriorities:
-            wordsWithClusters, disabledWords = self.groupBy(criteria, wordsWithClusters, disabledWords, 3)
+            wordsWithClusters, disabledWords = self.groupBy(criteria, wordsWithClusters, disabledWords)#, 3)
 
         # Remove empty elements
         r = []
