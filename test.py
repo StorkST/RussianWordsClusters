@@ -19,7 +19,7 @@ def getWords(input):
             words.append(verb)
     return words
 
-def assertArraysEqual(arr, oracle):
+def assertArraysEqual(arr, oracle, words_in):
     lenarr = len(arr)
     lenoracle = len(oracle)
     assert lenarr == len(oracle), 'assert false between {0} and {1}:\n  size {0}: {2}\n  size {1}: {3}'.format(str(lenarr), str(lenoracle), str(arr), str(oracle))
@@ -30,12 +30,12 @@ def assertArraysEqual(arr, oracle):
     for i in range(lenarr):
         e1 = arr[i]
         e2 = oracle[i]
-        pr += "\n" + e1.ljust(maxSize) + " | " + e2.ljust(maxSize)
+        pr += "\n" + words_in[i].ljust(maxSize) + " | " + e2.ljust(maxSize) + " | " + e1.ljust(maxSize)
         if e1 != e2:
             assertFalse = True
-            pr += " << Was expecting =="
+            pr += " << Was expecting ORACLE == ACTUAL"
 
-    assert(not assertFalse), "\n" + "ACTUAL".ljust(maxSize) + " | " + "ORACLE".ljust(maxSize) + pr
+    assert(not assertFalse), "\n" + "BEFORE".ljust(maxSize) + " | " + "ORACLE".ljust(maxSize) + " | " + "ACTUAL".ljust(maxSize) + pr
 
 def test_cluster_in_out(input, output):
     def test():
@@ -44,7 +44,7 @@ def test_cluster_in_out(input, output):
         russianClusters = rwc(words_in)
 
         words_out = rwc.flatten(russianClusters.getWordsAndClusters())
-        assertArraysEqual(words_out, oracle)
+        assertArraysEqual(words_out, oracle, words_in)
     return test
 
 if __name__ == '__main__':
