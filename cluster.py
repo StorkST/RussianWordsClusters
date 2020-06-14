@@ -140,11 +140,9 @@ class RussianWordsClusters:
             deepScores = "["
             for j in range(self.lenwords):
                 deepScores += self.words[j] + " " + str(self.scores[i][j]) + ", "
-            print (word + ": " + deepScores[:-1] + "]")
 
     # Returns words matching with word=words[i] and with CRITERIA
     def sortWords(self, i, disabledWords=[], r=3):
-        print("disabled: " + str(disabledWords))
         if i in disabledWords: # skip verb if she was already clustered
             return None, disabledWords
 
@@ -207,9 +205,7 @@ class RussianWordsClusters:
         wordsWithClusters = [] # Elements in this variable will contain either a String or an Array
         nbClusters = 0
 
-        print(self.words)
         self.prettyPrintScores()
-        print("size of words: " + str(self.lenwords))
 
         disabledWords = []
         for i in range(self.lenwords):
@@ -227,7 +223,6 @@ class RussianWordsClusters:
                 newCluster = []
                 nbClusters += 1
 
-                print (str(newCluster))
                 head = RussianWordsClusters.noPrefixWord(freqCluster)
                 newCluster.append(head)
 
@@ -235,10 +230,9 @@ class RussianWordsClusters:
                     subHead = RussianWordsClusters.reflexiveForm(head)
                     if subHead in freqCluster:
                         newCluster.append(subHead)
-                print (str(newCluster))
 
                 for word in sorted(freqCluster):
-                    print ("newCluster: " + str(newCluster))
+                    #print ("newCluster: " + str(newCluster))
                     if RussianWordsClusters.isReflexive(word):
                         headWord = RussianWordsClusters.noReflexiveForm(word)
                         if headWord in freqCluster and headWord not in newCluster:
