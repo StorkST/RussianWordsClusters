@@ -217,37 +217,8 @@ class RussianWordsClusters:
                     continue
 
                 assert isinstance(e, list)
-                # Order words in cluster
-                # Shorter first
-                # Then reflexive form after its original form (if reflexive available)
-                freqCluster = e
-                newCluster = []
                 nbClusters += 1
-
-                head = RussianWordsClusters.noPrefixWord(freqCluster)
-                newCluster.append(head)
-
-                if not RussianWordsClusters.isReflexive(head):
-                    subHead = RussianWordsClusters.reflexiveForm(head)
-                    if subHead in freqCluster:
-                        newCluster.append(subHead)
-
-                for word in sorted(freqCluster):
-                    #print ("newCluster: " + str(newCluster))
-                    if RussianWordsClusters.isReflexive(word):
-                        headWord = RussianWordsClusters.noReflexiveForm(word)
-                        if headWord in freqCluster and headWord not in newCluster:
-                            newCluster.append(headWord)
-                        if word not in newCluster:
-                            newCluster.append(word)
-                    else:
-                        if word not in newCluster:
-                            newCluster.append(word)
-                        subWord = RussianWordsClusters.reflexiveForm(word)
-                        if subWord in freqCluster and subWord not in newCluster:
-                            newCluster.append(subWord)
-
-                wordsWithClusters.append(newCluster)
+                wordsWithClusters.append(e)
 
         return wordsWithClusters
 
