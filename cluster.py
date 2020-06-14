@@ -94,20 +94,13 @@ class RussianWordsClusters:
     # * word1 != word2 by one edit of a vowel of consonant as defined with the tranformation pairs
     @staticmethod
     def compare(word1, word2):
-        # Disable this part?
-        w1NoReflex = RussianWordsClusters.noReflexiveForm(word1)
-        w2NoReflex = RussianWordsClusters.noReflexiveForm(word2)
-        #if (w1NoReflex in w2NoReflex) or (w2NoReflex in w1NoReflex):
-        #    return 1
-
         # if same stem
         w1Stem = RussianWordsClusters.possibleStem(word1)
         w2Stem = RussianWordsClusters.possibleStem(word2)
-        # if (w1Stem in w2Stem) or (w2Stem in w1Stem):
         if (w1Stem == w2Stem):
             return 1
 
-        # Find probable transformation of consonants of vowels
+        # Find probable transformation of consonants or vowels
         cpm1 = RussianWordsClusters.noReflexiveForm(word1)
         cpm2 = RussianWordsClusters.noReflexiveForm(word2)
         if (len(cpm1) == len(cpm2)):
