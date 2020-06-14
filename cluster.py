@@ -1,7 +1,17 @@
 import textdistance
 import types
+from enum import Flag, auto
+
+class Link(Flag):
+    NONE = auto()
+    STEM = auto()
+    VOWEL_TRANS = auto()
+    CONSONANT_TRANS = auto()
+    TRANS = VOWEL_TRANS | CONSONANT_TRANS
+    ALL = STEM |TRANS
 
 class RussianWordsClusters:
+
     VOWELS = ['а', 'у', 'о', 'ы', 'и', 'э', 'я', 'ю', 'ё', 'е']
     # TODO: manage consonant / vowel transformations with harsh consonants and ы -> и
     VOWEL_MUTATIONS = [ # https://en.wikipedia.org/wiki/Vowel_reduction_in_Russian
@@ -33,16 +43,16 @@ class RussianWordsClusters:
 
     words = []
     lenwords = 0
-    scores = []
+    links = []
 
     def __init__(self, newWords):
         self.words = []
         self.lenwords = 0
-        self.scores = []
+        self.links = []
 
         self.words = newWords
         self.lenwords = len(newWords)
-        self.setScores()
+        self.setLinks()
 
     @staticmethod
     def endsWithVowel(word):
@@ -98,7 +108,7 @@ class RussianWordsClusters:
         w1Stem = RussianWordsClusters.possibleStem(word1)
         w2Stem = RussianWordsClusters.possibleStem(word2)
         if (w1Stem == w2Stem):
-            return 1
+            return Link.STEM
 
         # Find probable transformation of consonants or vowels
         cpm1 = RussianWordsClusters.noReflexiveForm(word1)
@@ -111,69 +121,33 @@ class RussianWordsClusters:
                 w2Letter = cpm2[i]
                 for pair in RussianWordsClusters.VOWEL_MUTATIONS:
                     if (w1Letter in pair) and (w2Letter in pair):
-                        return 1
+                        return Link.VOWEL_TRANS
 
                 for pair in RussianWordsClusters.CONSONANT_MUTATIONS:
                     if (w1Letter in pair) and (w2Letter in pair):
-                        #print("MATCHED CONSONANTS: " + cpm1 + " AND " + cpm2)
-                        return 1
+                        return Link.CONSONANT_TRANS
 
-        return 0
+        return Link.NONE
 
-    def setScores(self):
-        # Init scores to 0
-        for i in range(self.lenwords):
-            self.scores.append([])
-            for j in range(self.lenwords):
-                self.scores[i].append(0)
+    def setLinks(self):
+        # Init links with 0
+        newLinks = [[Link.NONE for i in range(self.lenwords)] for j in range(self.lenwords)]
+        self.links = newLinks
 
         for i in range(self.lenwords):
             for j in range(i, self.lenwords):
                 if i == j: # avoid matching one verb with itself
                     continue
-                score = RussianWordsClusters.compare(self.words[i],self.words[j])
-                self.scores[i][j] = score
-                self.scores[j][i] = score # set score the other way. => allows i in "for j in range(i, lenwords)"
+                link = RussianWordsClusters.compare(self.words[i],self.words[j])
+                self.links[i][j] = link
+                self.links[j][i] = link # set link the other way. => allows i in "for j in range(i, lenwords)"
 
-    def prettyPrintScores(self):
+    def prettyPrintLinks(self):
         for i in range(self.lenwords):
             word = self.words[i]
-            deepScores = "["
+            deeplinks = "["
             for j in range(self.lenwords):
-                deepScores += self.words[j] + " " + str(self.scores[i][j]) + ", "
-
-    # Returns words matching with word=words[i] and with CRITERIA
-    def sortWords(self, i, disabledWords=[], r=3):
-        if i in disabledWords: # skip verb if she was already clustered
-            return None, disabledWords
-
-        currentWord = self.words[i]
-        cluster = []
-        for j in range(self.lenwords):
-            if j in disabledWords: # skip verb if she was already clustered
-                continue
-
-            score = self.scores[i][j]
-            if score == 1:
-                matchedWord = self.words[j]
-                if r > 0:
-                    r = r - 1
-                    disabledWords.append(i) # To not loop on the current word
-                    e, disabledWords = self.sortWords(j, disabledWords, r) # recurse to merge clusters into the top one
-                    if isinstance(e, list):
-                        cluster.extend(e)
-                    else:
-                        cluster.append(e)
-                else:
-                    cluster.append(matchedWord)
-                #if j not in disabledWords:
-                disabledWords.append(j) # disable matchedWord
-        if len(cluster) != 0:
-            #if i not in disabledWords: # TODO: why need this?
-            cluster.insert(0, currentWord)
-            return cluster, disabledWords
-        else:
-            return currentWord, disabledWords
+                deeplinks += self.words[j] + " " + str(self.links[i][j]) + ", "
 
     # Returns the first word without a prefix
     # If no word can be found without a prefix, returns the first word from the list
@@ -202,35 +176,70 @@ class RussianWordsClusters:
 
         return flat
 
-    def getWordsAndClusters(self):
-        wordsWithClusters = [] # Elements in this variable will contain either a String or an Array
-        nbClusters = 0
+    # Returns words that match (criteria) with word of value words[i]
+    # Returns word of value words[i] if no match was found
+    def getMatchingWords(self, iWord, criteria, disabledWords=[], r=3):
+        i = iWord
+        cluster = []
+        if i in disabledWords: # skip verb if she was already clustered
+            return cluster, disabledWords
 
-        self.prettyPrintScores()
+        currentWord = self.words[i]
+        for j in range(self.lenwords):
+            if j in disabledWords: # skip verb if she was already clustered
+                continue
 
+            link = self.links[i][j]
+            if link & criteria:
+                matchedWord = self.words[j]
+                if r > 0:
+                    r = r - 1
+                    disabledWords.append(i) # To not loop on the current word
+                    e, disabledWords = self.getMatchingWords(j, criteria, disabledWords, r) # recurse to merge deep clusters into the top one
+                    if isinstance(e, list):
+                        cluster.extend(e)
+                    else:
+                        cluster.append(e)
+                else:
+                    cluster.append(matchedWord)
+                # if j not in disabledWords:
+                disabledWords.append(j) # disable matchedWord
+        if len(cluster) != 0:
+            #if i not in disabledWords: # TODO: why need this?
+            cluster.insert(0, currentWord)
+            return cluster, disabledWords
+        else:
+            return [currentWord], disabledWords
+
+    def getWordsAndClusters(self, clusteringPriorities):
+        self.prettyPrintLinks()
+
+        wordsWithClusters = [[]] * self.lenwords # Elements will contain either None, a String or an Array (i.e. a cluster)
         disabledWords = []
-        for i in range(self.lenwords):
-            e, disabledWords = self.sortWords(i, disabledWords, 3) # Specify defaults arguments to avoid bug when getWordsAndClusters is called multiple times on a unique instance of class
-            if e != None:
-                if isinstance(e, str):
-                    wordsWithClusters.append(e)
-                    continue
 
-                assert isinstance(e, list)
-                nbClusters += 1
-                wordsWithClusters.append(e)
+        for criteria in clusteringPriorities:
+            for i in range(self.lenwords):
+                e, disabledWords = self.getMatchingWords(i, criteria, disabledWords, 3)
+                wordsWithClusters[i].extend(e)
 
-        return wordsWithClusters
+        # Remove empty elements
+        r = []
+        for e in wordsWithClusters:
+            if e != []:
+                r.append(e)
+        return r
 
 if __name__ == '__main__':
+    clusteringPriorities = [Link.STEM]#, Link.TRANS]
     words = []
+
     with open("./advanced") as f:
         for line in f:
             word = line.strip()
             words.append(word)
 
     rwc = RussianWordsClusters(words)
-    wordsWithClusters = rwc.getWordsAndClusters()
+    wordsWithClusters = rwc.getWordsAndClusters(clusteringPriorities)
 
     for e in wordsWithClusters:
         print(str(e))
