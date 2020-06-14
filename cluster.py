@@ -145,9 +145,10 @@ class RussianWordsClusters:
     def prettyPrintLinks(self):
         for i in range(self.lenwords):
             word = self.words[i]
-            deeplinks = "["
+            deepLinks = "["
             for j in range(self.lenwords):
-                deeplinks += self.words[j] + " " + str(self.links[i][j]) + ", "
+                deepLinks += self.words[j] + " " + str(self.links[i][j]) + ", "
+            print (word + ": " + deepLinks[:-1] + "]")
 
     # Returns the first word without a prefix
     # If no word can be found without a prefix, returns the first word from the list
@@ -178,49 +179,41 @@ class RussianWordsClusters:
 
     # Returns words that match (criteria) with word of value words[i]
     # Returns word of value words[i] if no match was found
-    def getMatchingWords(self, iWord, criteria, disabledWords=[], r=3):
-        i = iWord
-        cluster = []
-        if i in disabledWords: # skip verb if she was already clustered
-            return cluster, disabledWords
+    def groupBy(self, criteria, wordsWithClusters, disabledWords=[], r=3):
+        for i in range(self.lenwords):
+            if i in disabledWords: # skip verb if she was already clustered
+                return wordsWithClusters, disabledWords
+            currentWord = self.words[i]
 
-        currentWord = self.words[i]
-        for j in range(self.lenwords):
-            if j in disabledWords: # skip verb if she was already clustered
-                continue
+            for j in range(self.lenwords):
+                if j in disabledWords: # skip verb if she was already clustered
+                    continue
 
-            link = self.links[i][j]
-            if link & criteria:
-                matchedWord = self.words[j]
-                if r > 0:
-                    r = r - 1
-                    disabledWords.append(i) # To not loop on the current word
-                    e, disabledWords = self.getMatchingWords(j, criteria, disabledWords, r) # recurse to merge deep clusters into the top one
-                    if isinstance(e, list):
-                        cluster.extend(e)
-                    else:
-                        cluster.append(e)
-                else:
-                    cluster.append(matchedWord)
-                # if j not in disabledWords:
-                disabledWords.append(j) # disable matchedWord
-        if len(cluster) != 0:
-            #if i not in disabledWords: # TODO: why need this?
-            cluster.insert(0, currentWord)
-            return cluster, disabledWords
-        else:
-            return [currentWord], disabledWords
+                link = self.links[i][j]
+                if link & Link.NONE:
+                    continue
+                if link & criteria:
+                    matchedWord = self.words[j]
+                    if r > 0:
+                        r = r - 1
+                        disabledWords.append(i) # To not loop on the current word
+                        wordsWithClusters, disabledWords = self.groupBy(criteria, wordsWithClusters, disabledWords, r) # recurse to merge deep clusters into the top one
+
+                    wordsWithClusters[j].remove(matchedWord)
+                    wordsWithClusters[i].append(matchedWord)
+                    disabledWords.append(j) # disable matchedWord
+
+            return wordsWithClusters, disabledWords
 
     def getWordsAndClusters(self, clusteringPriorities):
         self.prettyPrintLinks()
-
-        wordsWithClusters = [[]] * self.lenwords # Elements will contain either None, a String or an Array (i.e. a cluster)
+        wordsWithClusters = []
+        for word in self.words:
+            wordsWithClusters.append([word])
         disabledWords = []
 
         for criteria in clusteringPriorities:
-            for i in range(self.lenwords):
-                e, disabledWords = self.getMatchingWords(i, criteria, disabledWords, 3)
-                wordsWithClusters[i].extend(e)
+            wordsWithClusters, disabledWords = self.groupBy(criteria, wordsWithClusters, disabledWords, 3)
 
         # Remove empty elements
         r = []

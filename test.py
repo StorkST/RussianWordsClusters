@@ -4,6 +4,7 @@ import sys
 import unittest
 import glob
 from cluster import RussianWordsClusters as rwc
+from cluster import Link as link
 
 #PATH_TESTS = './tests/!(*oracle)' # Somehow it doesn't work
 PATH_TESTS = "./tests/*"
