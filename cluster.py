@@ -8,7 +8,7 @@ class Link(Flag):
     VOWEL_TRANS = auto()
     CONSONANT_TRANS = auto()
     TRANS = VOWEL_TRANS | CONSONANT_TRANS
-    ALL = STEM |TRANS
+    ALL = STEM | TRANS
 
 class RussianWordsClusters:
 
@@ -22,7 +22,7 @@ class RussianWordsClusters:
         ['и', 'я'],
         ['а', 'я'],
         ['и', 'ю'],
-        ['у', 'ю'],
+        ['у', 'ю']
     ]
     CONSONANT_MUTATIONS = [ # https://en.wikipedia.org/wiki/Consonant_mutation#Russian
         ['к', 'ч'],
@@ -121,10 +121,12 @@ class RussianWordsClusters:
                 w2Letter = cpm2[i]
                 for pair in RussianWordsClusters.VOWEL_MUTATIONS:
                     if (w1Letter in pair) and (w2Letter in pair):
+                        print("VOWEL TRANS match: " + cpm1 + " and " + cpm2)
                         return Link.VOWEL_TRANS
 
                 for pair in RussianWordsClusters.CONSONANT_MUTATIONS:
                     if (w1Letter in pair) and (w2Letter in pair):
+                        print("CONSONANT TRANS match: " + cpm1 + " and " + cpm2)
                         return Link.CONSONANT_TRANS
 
         return Link.NONE
@@ -184,8 +186,6 @@ class RussianWordsClusters:
             if i in disabledWords: # skip verb if she was already clustered
                 continue
             currentWord = self.words[i]
-            if currentWord == "творить":
-                print("currentWord: творить!!")
 
             for j in range(self.lenwords):
                 if j in disabledWords: # skip verb if she was already clustered
@@ -196,8 +196,6 @@ class RussianWordsClusters:
                     continue
                 if link & criteria:
                     matchedWord = self.words[j]
-                    if matchedWord == "творить":
-                        print("matchedWord: творить!!!")
                     #if r > 0:
                     #    r = r - 1
                     #    disabledWords.append(i) # To not loop on the current word
@@ -227,7 +225,7 @@ class RussianWordsClusters:
         return r
 
 if __name__ == '__main__':
-    clusteringPriorities = [Link.STEM]#, Link.TRANS]
+    clusteringPriorities = [Link.STEM, Link.TRANS]
     words = []
 
     with open("./advanced") as f:

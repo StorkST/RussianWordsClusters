@@ -4,7 +4,7 @@ import sys
 import unittest
 import glob
 from cluster import RussianWordsClusters as rwc
-from cluster import Link as link
+from cluster import Link
 
 #PATH_TESTS = './tests/!(*oracle)' # Somehow it doesn't work
 PATH_TESTS = "./tests/*"
@@ -44,7 +44,7 @@ def test_cluster_in_out(input, output):
         oracle = getWords(output)
         russianClusters = rwc(words_in)
 
-        words_out = rwc.flatten(russianClusters.getWordsAndClusters())
+        words_out = rwc.flatten(russianClusters.getWordsAndClusters([Link.STEM, Link.TRANS]))
         assertArraysEqual(words_out, oracle, words_in)
     return test
 
