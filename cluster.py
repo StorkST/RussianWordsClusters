@@ -3,6 +3,17 @@ import types
 
 class RussianWordsClusters:
     VOWELS = ['а', 'у', 'о', 'ы', 'и', 'э', 'я', 'ю', 'ё', 'е']
+    # TODO: manage consonant / vowel transformations with harsh consonants and ы -> и
+    VOWEL_MUTATIONS = [ # https://en.wikipedia.org/wiki/Vowel_reduction_in_Russian
+        ['а', 'е', 'и', 'о'],
+        ['ы', 'о'],
+        ['и', 'ё'],
+        ['о', 'ё'],
+        ['и', 'я'],
+        ['а', 'я'],
+        ['и', 'ю'],
+        ['у', 'ю'],
+    ]
     CONSONANT_MUTATIONS = [ # https://en.wikipedia.org/wiki/Consonant_mutation#Russian
         ['к', 'ч'],
         ['г', 'ж'],
@@ -78,6 +89,9 @@ class RussianWordsClusters:
     def possibleStem(word):
         return RussianWordsClusters.noReflexiveForm(RussianWordsClusters.noPrefix(word))
 
+    # Return 1 when:
+    # * stem == stem (stem being the part without one of the PREFIXES and without reflexive form
+    # * word1 != word2 by one edit of a vowel of consonant as defined with the tranformation pairs
     @staticmethod
     def compare(word1, word2):
         # Disable this part?
@@ -98,24 +112,18 @@ class RussianWordsClusters:
         cpm2 = RussianWordsClusters.noReflexiveForm(word2)
         if (len(cpm1) == len(cpm2)):
             diffs = [i for i in range(len(cpm1)) if cpm1[i] != cpm2[i]]
-            if len(diffs) == 1:  # Accept only one transformation on a vowel
+            if len(diffs) == 1:  # Accept only one transformation
                 i = diffs[0]
                 w1Letter = cpm1[i]
                 w2Letter = cpm2[i]
-                if (w1Letter in RussianWordsClusters.VOWELS) and (w2Letter in RussianWordsClusters.VOWELS):
-                    #print("MATCHED STEMS WITH VOWELS: " + cpm1 + " AND " + cpm2)
-                    return 1
+                for pair in RussianWordsClusters.VOWEL_MUTATIONS:
+                    if (w1Letter in pair) and (w2Letter in pair):
+                        return 1
+
                 for pair in RussianWordsClusters.CONSONANT_MUTATIONS:
                     if (w1Letter in pair) and (w2Letter in pair):
                         #print("MATCHED CONSONANTS: " + cpm1 + " AND " + cpm2)
                         return 1
-
-        #dlDistance = textdistance.damerau_levenshtein.normalized_distance(noReflexiveForm(word1), noReflexiveForm(word2))
-        #if dlDistance <= 0.15:
-        #    return 1
-        #dlDistance = textdistance.damerau_levenshtein(noReflexiveForm(word1), noReflexiveForm(word2))
-        #if dlDistance <= 2:
-        #    return 1
 
         return 0
 
