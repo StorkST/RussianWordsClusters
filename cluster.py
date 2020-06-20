@@ -43,16 +43,17 @@ class RussianWordsClusters:
 
     words = []
     lenwords = 0
-    links = []
+    relations = []
+    redirected = []
 
     def __init__(self, newWords):
         self.words = []
         self.lenwords = 0
-        self.links = []
+        self.relations = []
 
         self.words = newWords
         self.lenwords = len(newWords)
-        self.setLinks()
+        self.setRelations()
 
     @staticmethod
     def endsWithVowel(word):
@@ -131,26 +132,26 @@ class RussianWordsClusters:
 
         return Link.NONE
 
-    def setLinks(self):
-        # Init links with 0
-        newLinks = [[Link.NONE for i in range(self.lenwords)] for j in range(self.lenwords)]
-        self.links = newLinks
+    def setRelations(self):
+        # Init relations with 0
+        newRelations = [[Link.NONE for i in range(self.lenwords)] for j in range(self.lenwords)]
+        self.relations = newRelations
 
         for i in range(self.lenwords):
             for j in range(i, self.lenwords):
                 if i == j: # avoid matching one verb with itself
                     continue
                 link = RussianWordsClusters.compare(self.words[i],self.words[j])
-                self.links[i][j] = link
-                self.links[j][i] = link # set link the other way. => allows i in "for j in range(i, lenwords)"
+                self.relations[i][j] = link
+                self.relations[j][i] = link # set link the other way. => allows i in "for j in range(i, lenwords)"
 
-    def prettyPrintLinks(self):
+    def prettyPrintRelations(self):
         for i in range(self.lenwords):
             word = self.words[i]
-            deepLinks = "["
+            deepRelations = "["
             for j in range(self.lenwords):
-                deepLinks += self.words[j] + " " + str(self.links[i][j]) + ", "
-            print (word + ": " + deepLinks[:-1] + "]")
+                deepRelations += self.words[j] + " " + str(self.relations[i][j]) + ", "
+            print (word + ": " + deepRelations[:-1] + "]")
 
     # Returns the first word without a prefix
     # If no word can be found without a prefix, returns the first word from the list
@@ -191,30 +192,32 @@ class RussianWordsClusters:
                 if j in disabledWords: # skip verb if she was already clustered
                     continue
 
-                link = self.links[i][j]
+                link = self.relations[i][j]
                 if link & Link.NONE:
                     continue
                 if link & criteria:
-                    matchedWord = self.words[j]
+                    matchedWords = wordsWithClusters[j]
                     #if r > 0:
                     #    r = r - 1
                     #    disabledWords.append(i) # To not loop on the current word
                     #    wordsWithClusters, disabledWords = self.groupBy(criteria, wordsWithClusters, disabledWords, r) # recurse to merge deep clusters into the top one
 
-                    wordsWithClusters[i].append(matchedWord)
-                    wordsWithClusters[j].remove(matchedWord)
+                    wordsWithClusters[i].extend(matchedWords)
+                    wordsWithClusters[j] = []
                     disabledWords.append(j) # disable matchedWord
 
         return wordsWithClusters, disabledWords
 
-    def getWordsAndClusters(self, clusteringPriorities):
-        #self.prettyPrintLinks()
+    def getWordsAndClusters(self, clusteringPriorities, mergeClusters):
+        #self.prettyPrintRelations()
         wordsWithClusters = []
         for word in self.words:
             wordsWithClusters.append([word])
         disabledWords = []
 
         for criteria in clusteringPriorities:
+            if mergeClusters:
+                disabledWords = []
             wordsWithClusters, disabledWords = self.groupBy(criteria, wordsWithClusters, disabledWords)#, 3)
 
         # Remove empty elements
@@ -226,6 +229,7 @@ class RussianWordsClusters:
 
 if __name__ == '__main__':
     clusteringPriorities = [Link.STEM, Link.TRANS]
+    mergeClusters = False
     words = []
 
     with open("./advanced") as f:
@@ -234,7 +238,7 @@ if __name__ == '__main__':
             words.append(word)
 
     rwc = RussianWordsClusters(words)
-    wordsWithClusters = rwc.getWordsAndClusters(clusteringPriorities)
+    wordsWithClusters = rwc.getWordsAndClusters(clusteringPriorities, mergeClusters)
 
     for e in wordsWithClusters:
         print(str(e))
