@@ -44,7 +44,7 @@ def test_cluster_in_out(input, output):
         oracle = getWords(output)
         russianClusters = rwc(words_in)
 
-        words_out = rwc.flatten(russianClusters.getWordsAndClusters([Link.STEM, Link.TRANS], False))
+        words_out = rwc.flatten(russianClusters.getWordsAndClusters([Link.STEM, Link.TRANS], True))
         assertArraysEqual(words_out, oracle, words_in)
     return test
 

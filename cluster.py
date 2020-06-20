@@ -202,8 +202,13 @@ class RussianWordsClusters:
                     #    disabledWords.append(i) # To not loop on the current word
                     #    wordsWithClusters, disabledWords = self.groupBy(criteria, wordsWithClusters, disabledWords, r) # recurse to merge deep clusters into the top one
 
+                    print("extend " + str(i) + " with " + str(j))
+                    print("disable " + str(j))
                     wordsWithClusters[i].extend(matchedWords)
-                    wordsWithClusters[j] = []
+                    wordsWithClusters[j] = wordsWithClusters[i]
+                    wordsWithClusters[i] = wordsWithClusters[j]
+
+                    self.redirected.append(j)
                     disabledWords.append(j) # disable matchedWord
 
         return wordsWithClusters, disabledWords
@@ -214,17 +219,21 @@ class RussianWordsClusters:
         for word in self.words:
             wordsWithClusters.append([word])
         disabledWords = []
+        self.redirected = []
 
         for criteria in clusteringPriorities:
             if mergeClusters:
                 disabledWords = []
             wordsWithClusters, disabledWords = self.groupBy(criteria, wordsWithClusters, disabledWords)#, 3)
+            print(str(wordsWithClusters))
+            print(str(disabledWords))
 
-        # Remove empty elements
+        # Remove redirections
         r = []
-        for e in wordsWithClusters:
-            if e != []:
-                r.append(e)
+        print(str(self.redirected))
+        for i in range(self.lenwords):
+            if i not in self.redirected:
+                r.extend(wordsWithClusters[i])
         return r
 
 if __name__ == '__main__':
