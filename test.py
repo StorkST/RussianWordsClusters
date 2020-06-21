@@ -52,6 +52,21 @@ def test_cluster_in_out(input, output, merge):
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     test_cases = []
+
+    args = sys.argv
+    if len(args) > 1:
+        for arg in sys.argv[1:]:
+            input = arg
+            output = input + "-oracle"
+            merge = True
+            if "not-merge" in input:
+                merge = False
+            suite.addTest(unittest.FunctionTestCase(
+                    test_cluster_in_out(input, output, merge), description=input))
+        unittest.TextTestRunner().run(suite)
+        sys.exit(0)
+
+    ## Run every test
     test_merge_cases = glob.glob(PATH_MERGE_TESTS)
     test_merge_cases.sort()
 
