@@ -146,11 +146,13 @@ class RussianWordsClusters:
                 self.relations[j][i] = link # set link the other way. => allows i in "for j in range(i, lenwords)"
 
     def prettyPrintRelations(self):
+        maxSize = len(max(self.words, key=len))
         for i in range(self.lenwords):
             word = self.words[i]
             deepRelations = "["
             for j in range(self.lenwords):
                 deepRelations += self.words[j] + " " + str(self.relations[i][j]) + ", "
+            print(word.ljust(maxSize) + ": " + str(deepRelations) + "]")
 
     # Returns the first word without a prefix
     # If no word can be found without a prefix, returns the first word from the list
@@ -183,6 +185,7 @@ class RussianWordsClusters:
     # Returns word of value words[i] if no match was found
     def groupOn(self, i, criterias, wordsWithClusters, disabledWords=[]):
         nbCriterias = len(criterias)
+        print(str(criterias))
         if i in disabledWords: # skip verb if she was already clustered
             return wordsWithClusters, disabledWords
         currentWord = self.words[i]
@@ -197,6 +200,7 @@ class RussianWordsClusters:
             if link & Link.NONE:
                 continue
             if link & currentCriteria:
+                print("here")
                 matchedWords = wordsWithClusters[j]
                 wordsWithClusters[i].extend(matchedWords)
                 wordsWithClusters[j] = wordsWithClusters[i]
@@ -220,7 +224,7 @@ class RussianWordsClusters:
         return wordsWithClusters, disabledWords
 
     def getWordsAndClusters(self, criterias, mergeCriterias):
-        #self.prettyPrintRelations()
+        self.prettyPrintRelations()
         wordsWithClusters = []
         for word in self.words:
             wordsWithClusters.append([word])
