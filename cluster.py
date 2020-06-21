@@ -186,6 +186,7 @@ class RussianWordsClusters:
     def groupOn(self, i, criterias, wordsWithClusters, disabledWords=[]):
         nbCriterias = len(criterias)
         print(str(criterias))
+        print(str(disabledWords))
         if i in disabledWords: # skip verb if she was already clustered
             return wordsWithClusters, disabledWords
         currentWord = self.words[i]
@@ -206,13 +207,12 @@ class RussianWordsClusters:
                 wordsWithClusters[j] = wordsWithClusters[i]
                 newWords.append(j)
                 self.redirected.append(j)
+                disabledWords.append(i)
 
         # If no words with a high priority are matched, then fetch words of lower priority
         if (len(newWords) == 0 and nbCriterias > 1):
             nbCriteriasLeft = nbCriterias - 1
             wordsWithClusters, disabledWords = self.groupOn(i, criterias[-nbCriteriasLeft:], wordsWithClusters, disabledWords) # recurse to merge deep clusters into the top one
-
-        disabledWords.append(i)
 
         # Append words with criterias of lower priority
         for w in newWords:
