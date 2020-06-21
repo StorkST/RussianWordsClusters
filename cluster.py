@@ -44,7 +44,6 @@ class RussianWordsClusters:
     words = []
     lenwords = 0
     relations = []
-    redirected = []
 
     def __init__(self, newWords):
         self.words = []
@@ -122,12 +121,12 @@ class RussianWordsClusters:
                 w2Letter = cpm2[i]
                 for pair in RussianWordsClusters.VOWEL_MUTATIONS:
                     if (w1Letter in pair) and (w2Letter in pair):
-                        print("VOWEL TRANS match: " + cpm1 + " and " + cpm2)
+                        #print("VOWEL TRANS match: " + cpm1 + " and " + cpm2)
                         return Link.VOWEL_TRANS
 
                 for pair in RussianWordsClusters.CONSONANT_MUTATIONS:
                     if (w1Letter in pair) and (w2Letter in pair):
-                        print("CONSONANT TRANS match: " + cpm1 + " and " + cpm2)
+                        #print("CONSONANT TRANS match: " + cpm1 + " and " + cpm2)
                         return Link.CONSONANT_TRANS
 
         return Link.NONE
@@ -183,12 +182,10 @@ class RussianWordsClusters:
 
     # Returns words that match with word of value words[i]
     # Returns word of value words[i] if no match was found
-    def groupOn(self, i, criterias, wordsWithClusters, disabledWords=[]):
+    def groupOn(self, i, criterias, wordsWithClusters, disabledWords=[], redirections=[]):
         nbCriterias = len(criterias)
-        print(str(criterias))
-        print(str(disabledWords))
         if i in disabledWords: # skip verb if she was already clustered
-            return wordsWithClusters, disabledWords
+            return wordsWithClusters, disabledWords, redirections
         currentWord = self.words[i]
         currentCriteria = criterias[0]
 
@@ -201,48 +198,50 @@ class RussianWordsClusters:
             if link & Link.NONE:
                 continue
             if link & currentCriteria:
-                print("here")
-                matchedWords = wordsWithClusters[j]
-                wordsWithClusters[i].extend(matchedWords)
-                wordsWithClusters[j] = wordsWithClusters[i]
                 newWords.append(j)
-                self.redirected.append(j)
+                wordsWithClusters[i].extend(wordsWithClusters[j])
+                wordsWithClusters[j] = wordsWithClusters[i]
+                redirections.append(j)
                 disabledWords.append(i)
 
         # If no words with a high priority are matched, then fetch words of lower priority
         if (len(newWords) == 0 and nbCriterias > 1):
             nbCriteriasLeft = nbCriterias - 1
-            wordsWithClusters, disabledWords = self.groupOn(i, criterias[-nbCriteriasLeft:], wordsWithClusters, disabledWords) # recurse to merge deep clusters into the top one
+            wordsWithClusters, disabledWords, redirections =\
+                self.groupOn(i, criterias[-nbCriteriasLeft:], wordsWithClusters, disabledWords, redirections)
 
         # Append words with criterias of lower priority
         for w in newWords:
             if nbCriterias > 1:
                 nbCriteriasLeft = nbCriterias - 1
-                wordsWithClusters, disabledWords = self.groupOn(w, criterias[-nbCriteriasLeft:], wordsWithClusters, disabledWords) # recurse to merge deep clusters into the top one
+                wordsWithClusters, disabledWords, redirections =\
+                    self.groupOn(w, criterias[-nbCriteriasLeft:], wordsWithClusters, disabledWords, redirections)
             disabledWords.append(w)
 
-        return wordsWithClusters, disabledWords
+        return wordsWithClusters, disabledWords, redirections
 
     def getWordsAndClusters(self, criterias, mergeCriterias):
-        self.prettyPrintRelations()
+        #self.prettyPrintRelations()
         wordsWithClusters = []
         for word in self.words:
             wordsWithClusters.append([word])
         disabledWords = []
-        self.redirected = []
+        redirections = []
 
         if mergeCriterias:
             for i in range(self.lenwords):
-                wordsWithClusters, disabledWords = self.groupOn(i, criterias, wordsWithClusters, disabledWords)
+                wordsWithClusters, disabledWords, redirections =\
+                    self.groupOn(i, criterias, wordsWithClusters, disabledWords, redirections)
         else:
             for criteria in criterias:
                 for i in range(self.lenwords):
-                    wordsWithClusters, disabledWords = self.groupOn(i, [criteria], wordsWithClusters, disabledWords)
+                    wordsWithClusters, disabledWords, redirections =\
+                        self.groupOn(i, [criteria], wordsWithClusters, disabledWords, redirections)
 
         # Remove redirections
         r = []
         for i in range(self.lenwords):
-            if i not in self.redirected:
+            if i not in redirections:
                 r.extend(wordsWithClusters[i])
         return r
 
