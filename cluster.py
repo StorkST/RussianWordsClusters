@@ -245,6 +245,16 @@ class RussianWordsClusters:
                 r.extend(wordsWithClusters[i])
         return r
 
+
+class RussianWordsPairsClusters(RussianWordsClusters):
+
+    # Return 1 when:
+    # * stem == stem (stem being the part without one of the PREFIXES and without reflexive form
+    # * word1 != word2 by one edit of a vowel of consonant as defined with the tranformation pairs
+    @staticmethod
+    def compare(word1, word2):
+        return super().compare(word1,word2)
+
 if __name__ == '__main__':
     clusteringPriorities = [Link.STEM, Link.TRANS]
     mergeCriterias = False
@@ -255,7 +265,7 @@ if __name__ == '__main__':
             word = line.strip()
             words.append(word)
 
-    rwc = RussianWordsClusters(words)
+    rwc = RussianWordsPairsClusters(words)
     wordsWithClusters = rwc.getWordsAndClusters(clusteringPriorities, mergeCriterias)
 
     for e in wordsWithClusters:
