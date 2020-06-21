@@ -69,9 +69,6 @@ if __name__ == '__main__':
     test_merge_cases = glob.glob(PATH_MERGE_TESTS)
     test_merge_cases.sort()
 
-    test_notmerge_cases = glob.glob(PATH_NOTMERGE_TESTS)
-    test_notmerge_cases.sort()
-
     # MERGE TESTS
     nbDel = 0
     for i in range(len(test_merge_cases)): # Hack because can't make glob work as wanted

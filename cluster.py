@@ -102,8 +102,7 @@ class RussianWordsClusters:
     # Return 1 when:
     # * stem == stem (stem being the part without one of the PREFIXES and without reflexive form
     # * word1 != word2 by one edit of a vowel of consonant as defined with the tranformation pairs
-    @staticmethod
-    def compare(word1, word2):
+    def compare(self, word1, word2):
         # if same stem
         w1Stem = RussianWordsClusters.possibleStem(word1)
         w2Stem = RussianWordsClusters.possibleStem(word2)
@@ -140,7 +139,7 @@ class RussianWordsClusters:
             for j in range(i, self.lenwords):
                 if i == j: # avoid matching one verb with itself
                     continue
-                link = RussianWordsClusters.compare(self.words[i],self.words[j])
+                link = self.compare(self.words[i],self.words[j])
                 self.relations[i][j] = link
                 self.relations[j][i] = link # set link the other way. => allows i in "for j in range(i, lenwords)"
 
@@ -251,9 +250,47 @@ class RussianWordsPairsClusters(RussianWordsClusters):
     # Return 1 when:
     # * stem == stem (stem being the part without one of the PREFIXES and without reflexive form
     # * word1 != word2 by one edit of a vowel of consonant as defined with the tranformation pairs
-    @staticmethod
-    def compare(word1, word2):
-        return super().compare(word1,word2)
+    # TODO: optimise by splitting words at the init of the object instead of splitting them N times
+    def compare(self, wordpair1, wordpair2):
+        wp1 = wordpair1.split("/")
+        wp11 = ""
+        wp12 = ""
+        if len(wp1) == 1:
+            wp11 = wp1[0]
+            wp12 = wp1[0]
+        else:
+            assert len(wp1) == 2
+            wp11 = wp1[0]
+            wp12 = wp1[1]
+
+        wp2 = wordpair2.split("/")
+        wp21 = ""
+        wp22 = ""
+        if len(wp2) == 1:
+            wp21 = wp2[0]
+            wp22 = wp2[0]
+        else:
+            assert len(wp2) == 2
+            wp21 = wp2[0]
+            wp22 = wp2[1]
+
+        # TODO: to choose between different Link we need to know the criteria of priority for clustering
+        # It would be best to set the relations when the arguments for criterias are received,
+        # i.e. at the getWordsAndClusters function call
+        maxCmp = Link.NONE
+        cmps = []
+        cmps.append(super().compare(wp11,wp21))
+        cmps.append(super().compare(wp11,wp22))
+        cmps.append(super().compare(wp12,wp21))
+        cmps.append(super().compare(wp12,wp22))
+        for cmp in cmps:
+            if cmp & Link.STEM:
+                maxCmp = Link.STEM
+            else:
+                if not maxCmp & Link.STEM:
+                    if cmp & Link.TRANS:
+                        maxCmp = Link.TRANS
+        return maxCmp
 
 if __name__ == '__main__':
     clusteringPriorities = [Link.STEM, Link.TRANS]
