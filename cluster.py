@@ -206,7 +206,6 @@ class RussianWordsClusters:
                     print("disable " + str(j))
                     wordsWithClusters[i].extend(matchedWords)
                     wordsWithClusters[j] = wordsWithClusters[i]
-                    wordsWithClusters[i] = wordsWithClusters[j]
 
                     self.redirected.append(j)
                     disabledWords.append(j) # disable matchedWord
