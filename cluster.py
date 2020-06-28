@@ -241,6 +241,7 @@ class RussianWordsClusters:
         r = []
         for i in range(self.lenwords):
             if i not in redirections:
+                print(str(wordsWithClusters[i]))
                 r.extend(wordsWithClusters[i])
         return r
 
@@ -297,7 +298,7 @@ if __name__ == '__main__':
     mergeCriterias = False
     words = []
 
-    with open("./advanced") as f:
+    with open("./B2verbpairs") as f:
         for line in f:
             word = line.strip()
             words.append(word)
