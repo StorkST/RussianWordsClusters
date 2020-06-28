@@ -219,8 +219,8 @@ class RussianWordsClusters:
         return wordsWithClusters, disabledWords, redirections
 
     def getWordsAndClusters(self, criterias, mergeCriterias):
-        #self.prettyPrintRelations()
         self.setRelations(criterias)
+        #self.prettyPrintRelations()
 
         wordsWithClusters = []
         for word in self.words:
@@ -276,20 +276,18 @@ class RussianWordsPairsClusters(RussianWordsClusters):
         # TODO: to choose between different Link we need to know the criteria of priority for clustering
         # It would be best to set the relations when the arguments for criterias are received,
         # i.e. at the getWordsAndClusters function call
-        maxCmp = Link.NONE
         cmps = []
         cmps.append(super().compare(wp11,wp21))
         cmps.append(super().compare(wp11,wp22))
         cmps.append(super().compare(wp12,wp21))
         cmps.append(super().compare(wp12,wp22))
-        for cmp in cmps:
-            if cmp & Link.STEM:
-                maxCmp = Link.STEM
-            else:
-                if not maxCmp & Link.STEM:
-                    if cmp & Link.TRANS:
-                        maxCmp = Link.TRANS
-        return maxCmp
+
+        for criteria in criterias:
+            for cmp in cmps:
+                if criteria & cmp:
+                    return criteria
+
+        return Link.NONE
 
 if __name__ == '__main__':
     clusteringPriorities = [Link.STEM, Link.TRANS]
