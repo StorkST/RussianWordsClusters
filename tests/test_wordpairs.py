@@ -5,7 +5,7 @@ import unittest
 import glob
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from cluster import RussianWordsPairsClusters as rwc
-from cluster import Link
+from cluster import Relation
 
 #PATH_TESTS = './tests/!(*oracle)' # Somehow it doesn't work
 PATH_MERGE_TESTS = "./tests/wordpairs/merge/*"
@@ -45,7 +45,7 @@ def test_cluster_in_out(input, output, merge):
         oracle = getWords(output)
         russianClusters = rwc(words_in)
 
-        words_out = rwc.flatten(russianClusters.getWordsAndClusters([Link.STEM, Link.TRANS], merge))
+        words_out = rwc.flatten(russianClusters.getWordsAndClusters([Relation.STEM, Relation.TRANS], merge))
         assertArraysEqual(words_out, oracle, words_in)
     return test
 

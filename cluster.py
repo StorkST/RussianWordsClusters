@@ -2,7 +2,7 @@ import textdistance
 import types
 from enum import Flag, auto
 
-class Link(Flag):
+class Relation(Flag):
     NONE = auto()
     STEM = auto()
     VOWEL_TRANS = auto()
@@ -104,7 +104,7 @@ class RussianWordsClusters:
         w1Stem = RussianWordsClusters.possibleStem(word1)
         w2Stem = RussianWordsClusters.possibleStem(word2)
         if (w1Stem == w2Stem):
-            return Link.STEM
+            return Relation.STEM
 
         # Find probable transformation of consonants or vowels
         cpm1 = RussianWordsClusters.noReflexiveForm(word1)
@@ -118,18 +118,18 @@ class RussianWordsClusters:
                 for pair in RussianWordsClusters.VOWEL_MUTATIONS:
                     if (w1Letter in pair) and (w2Letter in pair):
                         #print("VOWEL TRANS match: " + cpm1 + " and " + cpm2)
-                        return Link.VOWEL_TRANS
+                        return Relation.VOWEL_TRANS
 
                 for pair in RussianWordsClusters.CONSONANT_MUTATIONS:
                     if (w1Letter in pair) and (w2Letter in pair):
                         #print("CONSONANT TRANS match: " + cpm1 + " and " + cpm2)
-                        return Link.CONSONANT_TRANS
+                        return Relation.CONSONANT_TRANS
 
-        return Link.NONE
+        return Relation.NONE
 
     def setRelations(self, criterias):
         # Init relations with 0
-        newRelations = [[Link.NONE for i in range(self.lenwords)] for j in range(self.lenwords)]
+        newRelations = [[Relation.NONE for i in range(self.lenwords)] for j in range(self.lenwords)]
         self.relations = newRelations
 
         for i in range(self.lenwords):
@@ -191,7 +191,7 @@ class RussianWordsClusters:
                 continue
 
             link = self.relations[i][j]
-            if link & Link.NONE:
+            if link & Relation.NONE:
                 continue
             if link & currentCriteria:
                 newWords.append(j)
@@ -277,16 +277,16 @@ class RussianWordsPairsClusters(RussianWordsClusters):
         cmps.append(super().compare(wp12,wp21))
         cmps.append(super().compare(wp12,wp22))
 
-        # choose between different Link knowing the criteria of priority for clustering
+        # choose between different Relation knowing the criteria of priority for clustering
         for criteria in criterias:
             for cmp in cmps:
                 if criteria & cmp:
                     return criteria
 
-        return Link.NONE
+        return Relation.NONE
 
 if __name__ == '__main__':
-    clusteringPriorities = [Link.STEM, Link.TRANS]
+    clusteringPriorities = [Relation.STEM, Relation.TRANS]
     mergeCriterias = False
     words = []
 
