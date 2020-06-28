@@ -46,8 +46,6 @@ class RussianWordsClusters:
     relations = []
 
     def __init__(self, newWords):
-        self.words = []
-        self.lenwords = 0
         self.relations = []
 
         self.words = newWords
@@ -248,7 +246,7 @@ class RussianWordsClusters:
 
 class RussianWordsPairsClusters(RussianWordsClusters):
 
-    # Return 1 when one word in a pair match at least one word in the other pair
+    # Return 1 when one word in a pair matches at least one word in the other pair
     # TODO: optimise by splitting words at the init of the object instead of splitting them N times
     def compare(self, wordpair1, wordpair2, criterias):
         wp1 = wordpair1.split("/")
@@ -273,15 +271,13 @@ class RussianWordsPairsClusters(RussianWordsClusters):
             wp21 = wp2[0]
             wp22 = wp2[1]
 
-        # TODO: to choose between different Link we need to know the criteria of priority for clustering
-        # It would be best to set the relations when the arguments for criterias are received,
-        # i.e. at the getWordsAndClusters function call
         cmps = []
         cmps.append(super().compare(wp11,wp21))
         cmps.append(super().compare(wp11,wp22))
         cmps.append(super().compare(wp12,wp21))
         cmps.append(super().compare(wp12,wp22))
 
+        # choose between different Link knowing the criteria of priority for clustering
         for criteria in criterias:
             for cmp in cmps:
                 if criteria & cmp:
