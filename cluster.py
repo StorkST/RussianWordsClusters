@@ -52,7 +52,6 @@ class RussianWordsClusters:
 
         self.words = newWords
         self.lenwords = len(newWords)
-        self.setRelations()
 
     @staticmethod
     def endsWithVowel(word):
@@ -102,7 +101,7 @@ class RussianWordsClusters:
     # Return 1 when:
     # * stem == stem (stem being the part without one of the PREFIXES and without reflexive form
     # * word1 != word2 by one edit of a vowel of consonant as defined with the tranformation pairs
-    def compare(self, word1, word2):
+    def compare(self, word1, word2, criterias=[]):
         # if same stem
         w1Stem = RussianWordsClusters.possibleStem(word1)
         w2Stem = RussianWordsClusters.possibleStem(word2)
@@ -130,7 +129,7 @@ class RussianWordsClusters:
 
         return Link.NONE
 
-    def setRelations(self):
+    def setRelations(self, criterias):
         # Init relations with 0
         newRelations = [[Link.NONE for i in range(self.lenwords)] for j in range(self.lenwords)]
         self.relations = newRelations
@@ -139,7 +138,7 @@ class RussianWordsClusters:
             for j in range(i, self.lenwords):
                 if i == j: # avoid matching one verb with itself
                     continue
-                link = self.compare(self.words[i],self.words[j])
+                link = self.compare(self.words[i],self.words[j], criterias)
                 self.relations[i][j] = link
                 self.relations[j][i] = link # set link the other way. => allows i in "for j in range(i, lenwords)"
 
@@ -221,6 +220,8 @@ class RussianWordsClusters:
 
     def getWordsAndClusters(self, criterias, mergeCriterias):
         #self.prettyPrintRelations()
+        self.setRelations(criterias)
+
         wordsWithClusters = []
         for word in self.words:
             wordsWithClusters.append([word])
@@ -241,18 +242,15 @@ class RussianWordsClusters:
         r = []
         for i in range(self.lenwords):
             if i not in redirections:
-                print(str(wordsWithClusters[i]))
                 r.extend(wordsWithClusters[i])
         return r
 
 
 class RussianWordsPairsClusters(RussianWordsClusters):
 
-    # Return 1 when:
-    # * stem == stem (stem being the part without one of the PREFIXES and without reflexive form
-    # * word1 != word2 by one edit of a vowel of consonant as defined with the tranformation pairs
+    # Return 1 when one word in a pair match at least one word in the other pair
     # TODO: optimise by splitting words at the init of the object instead of splitting them N times
-    def compare(self, wordpair1, wordpair2):
+    def compare(self, wordpair1, wordpair2, criterias):
         wp1 = wordpair1.split("/")
         wp11 = ""
         wp12 = ""
