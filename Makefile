@@ -1,3 +1,6 @@
+python := python3.8
+test_dir := tests/
+
 test:
-	python3.8 test_words.py
-	python3.8 test_wordpairs.py
+	$(python) $(test_dir)test_words.py
+	$(python) $(test_dir)test_wordpairs.py
