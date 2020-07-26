@@ -1,5 +1,7 @@
-import textdistance
+from pathlib import Path
+import argparse
 import types
+import sys
 from enum import Flag, auto
 
 class Relation(Flag):
@@ -286,16 +288,39 @@ class RussianWordsPairsClusters(RussianWordsClusters):
         return Relation.NONE
 
 if __name__ == '__main__':
-    clusteringPriorities = [Relation.STEM, Relation.TRANS]
-    mergeCriterias = False
-    words = []
+    parser = argparse.ArgumentParser(description='Clustering of russian words')
+    parser.add_argument('-in', '--input', dest='input', required=True, help='')
+    parser.add_argument('-p', '--are-pairs', dest='arepairs', required=False, action="store_true", help='')
+    parser.add_argument('-c', '--criterias', dest='criterias', required=True, nargs='+', help='')
+    parser.add_argument('-m', '--do-merge', dest='merge', required=False, action="store_true", help='')
+    args = parser.parse_args()
 
-    with open("./B2verbpairs") as f:
+    mergeCriterias = args.merge
+
+    input = args.input
+    f = Path(input)
+    assert f.exists()
+
+    words = []
+    with open(input) as f:
         for line in f:
             word = line.strip()
             words.append(word)
 
-    rwc = RussianWordsPairsClusters(words)
+    clusteringPriorities = []
+    for criteria in args.criterias:
+        val = getattr(Relation, criteria, None)
+        if val == None:
+            print("Criterias argument - Unexpected Relation attribute: " + criteria)
+            sys.exit(1)
+        clusteringPriorities.append(val)
+
+    rwc = None
+    if args.arepairs:
+        rwc = RussianWordsPairsClusters(words)
+    else:
+        rwc = RussianWordsClusters(words)
+
     wordsWithClusters = rwc.getWordsAndClusters(clusteringPriorities, mergeCriterias)
 
     for e in wordsWithClusters:
