@@ -1,6 +1,7 @@
 # Russian Words Clusters
 
 Russian Words Clusters offers a way to cluster russian words by criterias (by a common stem, by the closeness of vowels or consonants).
+
 For now it supports verbs but was not built for clusterings words that may have different suffixes, as would be a noun and an adjective of a same stem.
 
 It offers options:
@@ -33,7 +34,7 @@ Content of `file1`:
 The CLI `cluster.py` offers the possibility to cluster words and words pairs.
 
 #### Classes
-Classes in `cluster.py` can be called to cluster words. You can refer to the code in the Main part of `cluster.py`, or to the code contained in the `tests` folder.
+Classes in `cluster.py` can be called to cluster words. As for usage examples, you can refer to the code in the Main part of `cluster.py`, or to the code contained in the `tests` folder.
 
 
 ## A more complex example: clustering words pairs
