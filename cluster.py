@@ -292,7 +292,7 @@ if __name__ == '__main__':
     parser.add_argument('-in', '--input', dest='input', required=True, help='')
     parser.add_argument('-p', '--are-pairs', dest='arepairs', required=False, action="store_true", help='')
     parser.add_argument('-c', '--criterias', dest='criterias', required=True, nargs='+', help='')
-    parser.add_argument('-m', '--do-merge', dest='merge', required=False, action="store_true", help='')
+    parser.add_argument('-m', '--merge', dest='merge', required=False, action="store_true", help='')
     args = parser.parse_args()
 
     mergeCriterias = args.merge
