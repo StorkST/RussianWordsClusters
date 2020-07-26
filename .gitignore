@@ -1,1 +1,4 @@
 __pycache__/
+build/
+dist/
+russian_words_clusters.egg-info/
