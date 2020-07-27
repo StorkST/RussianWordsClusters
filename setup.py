@@ -4,8 +4,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="russian-words-clusters",
-    version="0.0.1",
+    name="RussianWordsClusters",
+    version="0.0.3",
     author="Vincent Charrade",
     author_email="vchd@pm.me",
     description="Clustering russian words by multiple criterias",
