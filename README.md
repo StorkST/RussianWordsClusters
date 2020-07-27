@@ -35,7 +35,9 @@ The CLI `cluster.py` offers the possibility to cluster words and words pairs.
 
 #### Classes
 Classes in `cluster.py` can be called to cluster words. As for usage examples, you can refer to the code in the Main part of `cluster.py`, or to the code contained in the `tests` folder.
-Project has a pip package: https://pypi.org/project/russian-words-clusters/
+
+Project has a pip package: https://pypi.org/project/russian-words-clusters/</br>
+Once the package installed you can import classes into your Python code using `from russianwords.clustering import *`.
 
 
 ## A more complex example: clustering words pairs
