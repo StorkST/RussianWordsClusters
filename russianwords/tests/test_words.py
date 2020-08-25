@@ -1,11 +1,12 @@
 import os
 from pathlib import Path
-import sys
 import unittest
 import glob
+
+import sys
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
-from cluster import RussianWordsClusters as rwc
-from cluster import Relation
+from clustering import RussianWordsClusters as rwc
+from clustering import Relation
 
 #PATH_TESTS = './tests/!(*oracle)' # Somehow it doesn't work
 PATH_MERGE_TESTS = "./tests/words/merge/*"
