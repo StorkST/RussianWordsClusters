@@ -1,6 +1,7 @@
 from pathlib import Path
 import argparse
 import types
+import re
 import sys
 from enum import Flag, auto
 
@@ -45,7 +46,7 @@ class RussianWordsClusters:
             "за",
             "изо", "из", "ис",
             "недо", "надо", "над", "на", "низо", "низ", "нис",
-            "ото", "от","обо", "об", "о",
+            "ото", "от", "обо", "об", "о",
             "при", "проис", "про", "пред", "пре", "пере", "пона", "подъ", "подо", "под", "по",
             "раз", "разо", "расс", "рас",
             "со", "с",
@@ -118,11 +119,34 @@ class RussianWordsClusters:
         if (word1 in blacklist) or (word2 in blacklist):
             return Relation.NONE
 
-        # if same stem
+        # Words have the same stem if
+        #   1. Either they are equals without the reflexive form and without the prefix
         w1Stem = RussianWordsClusters.possibleStem(word1)
         w2Stem = RussianWordsClusters.possibleStem(word2)
         if (w1Stem == w2Stem):
             return Relation.STEM
+
+        #   2. Either the result of the "longer non reflexive word" minus the "shorter non reflexive word" gives a known verb Prefixe
+        # then we assume the two verbs have the same stem
+        w1nonReflex = RussianWordsClusters.noReflexiveForm(word1)
+        w2nonReflex = RussianWordsClusters.noReflexiveForm(word2)
+        shorterWord = ""
+        longerWord = ""
+        if (w1nonReflex == w2nonReflex):
+            return Relation.STEM
+
+        if (len(w1nonReflex) < len(w2nonReflex)):
+            shorterWord = w1nonReflex
+            longerWord = w2nonReflex
+        else:
+            shorterWord = w2nonReflex
+            longerWord = w1nonReflex
+
+        if longerWord.endswith(shorterWord):
+            possiblePrefix = re.sub(shorterWord + '$', '', longerWord)
+            if possiblePrefix in RussianWordsClusters.PREFIXES:
+                return Relation.STEM
+
 
         # Find probable transformation of consonants or vowels
         cpm1 = RussianWordsClusters.noReflexiveForm(word1)
