@@ -113,6 +113,11 @@ class RussianWordsClusters:
     # * stem == stem (stem being the part without one of the PREFIXES and without reflexive form
     # * word1 != word2 by one edit of a vowel of consonant as defined with the tranformation pairs
     def compare(self, word1, word2, criterias=[]):
+        blacklist = ["*"] # In case special characters are used to represent words
+
+        if (word1 in blacklist) or (word2 in blacklist):
+            return Relation.NONE
+
         # if same stem
         w1Stem = RussianWordsClusters.possibleStem(word1)
         w2Stem = RussianWordsClusters.possibleStem(word2)
