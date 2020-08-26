@@ -121,6 +121,7 @@ class RussianWordsClusters:
 
         # Words have the same stem if
         #   1. they are equals without the reflexive form and without the prefix
+        #   this is useful for comparing verbs where both verbs have prefixes. However we cannot be sure we remove prefixes or the first letters of the word (TODO: check that what is removed is not the next letters of the stem. Ex: видеть)
         #    , but it is not sufficient for следить as it assumes that следить has the prefix с- when it's part of its stem
         w1Stem = RussianWordsClusters.possibleStem(word1)
         w2Stem = RussianWordsClusters.possibleStem(word2)
