@@ -120,51 +120,49 @@ class RussianWordsClusters:
             return Relation.NONE
 
         # Words have the same stem if
-        #   1. Either they are equals without the reflexive form and without the prefix
+        #   1. they are equals without the reflexive form and without the prefix
+        #    , but it is not sufficient for следить as it assumes that следить has the prefix с- when it's part of its stem
         w1Stem = RussianWordsClusters.possibleStem(word1)
         w2Stem = RussianWordsClusters.possibleStem(word2)
         if (w1Stem == w2Stem):
             return Relation.STEM
 
-        #   2. Either the result of the "longer non reflexive word" minus the "shorter non reflexive word" gives a known verb Prefixe
-        # then we assume the two verbs have the same stem
-        w1nonReflex = RussianWordsClusters.noReflexiveForm(word1)
-        w2nonReflex = RussianWordsClusters.noReflexiveForm(word2)
+        #   2. The result of the "longer non reflexive word" minus the "shorter non reflexive word" may give a known verb Prefix
+        #    , if that's the case then we can assume the two verbs have the same stem
+        cmp1 = RussianWordsClusters.noReflexiveForm(word1)
+        cmp2 = RussianWordsClusters.noReflexiveForm(word2)
         shorterWord = ""
         longerWord = ""
-        if (w1nonReflex == w2nonReflex):
+        if (cmp1 == cmp2):
             return Relation.STEM
 
-        if (len(w1nonReflex) < len(w2nonReflex)):
-            shorterWord = w1nonReflex
-            longerWord = w2nonReflex
+        if (len(cmp1) < len(cmp2)):
+            shorterWord = cmp1
+            longerWord = cmp2
         else:
-            shorterWord = w2nonReflex
-            longerWord = w1nonReflex
+            shorterWord = cmp2
+            longerWord = cmp1
 
         if longerWord.endswith(shorterWord):
             possiblePrefix = re.sub(shorterWord + '$', '', longerWord)
             if possiblePrefix in RussianWordsClusters.PREFIXES:
                 return Relation.STEM
 
-
         # Find probable transformation of consonants or vowels
-        cpm1 = RussianWordsClusters.noReflexiveForm(word1)
-        cpm2 = RussianWordsClusters.noReflexiveForm(word2)
-        if (len(cpm1) == len(cpm2)):
-            diffs = [i for i in range(len(cpm1)) if cpm1[i] != cpm2[i]]
+        if (len(cmp1) == len(cmp2)):
+            diffs = [i for i in range(len(cmp1)) if cmp1[i] != cmp2[i]]
             if len(diffs) == 1:  # Accept only one transformation
                 i = diffs[0]
-                w1Letter = cpm1[i]
-                w2Letter = cpm2[i]
+                w1Letter = cmp1[i]
+                w2Letter = cmp2[i]
                 for pair in RussianWordsClusters.VOWEL_MUTATIONS:
                     if (w1Letter in pair) and (w2Letter in pair):
-                        #print("VOWEL TRANS match: " + cpm1 + " and " + cpm2)
+                        #print("VOWEL TRANS match: " + cmp1 + " and " + cmp2)
                         return Relation.VOWEL_TRANS
 
                 for pair in RussianWordsClusters.CONSONANT_MUTATIONS:
                     if (w1Letter in pair) and (w2Letter in pair):
-                        #print("CONSONANT TRANS match: " + cpm1 + " and " + cpm2)
+                        #print("CONSONANT TRANS match: " + cmp1 + " and " + cmp2)
                         return Relation.CONSONANT_TRANS
 
         return Relation.NONE
