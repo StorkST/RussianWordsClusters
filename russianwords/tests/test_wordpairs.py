@@ -55,9 +55,18 @@ if __name__ == '__main__':
     test_cases = []
 
     args = sys.argv
+    uniqSuite = []
     if len(args) > 1:
         for arg in sys.argv[1:]:
+            # Control input to avoid duplicates and suffix "-oracle"
             input = arg
+            if input.endswith("-oracle"):
+                input = input[0:-7]
+            if input in uniqSuite:
+                continue
+            else:
+                uniqSuite.append(input)
+
             output = input + "-oracle"
             merge = True
             if "not-merge" in input:

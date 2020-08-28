@@ -3,6 +3,7 @@ import argparse
 import types
 import re
 import sys
+import copy
 from enum import Flag, auto
 
 class Relation(Flag):
@@ -48,7 +49,7 @@ class RussianWordsClusters:
             "недо", "надо", "над", "на", "низо", "низ", "нис",
             "ото", "от", "обо", "об", "о",
             "при", "проис", "про", "пред", "пре", "пере", "пона", "подъ", "подо", "под", "по",
-            "раз", "разо", "расс", "рас",
+            "раз", "разо", "рас",
             "со", "с",
             "у"
     ]  # Usual verb prefixes
@@ -188,7 +189,31 @@ class RussianWordsClusters:
             deepRelations = "["
             for j in range(self.lenwords):
                 deepRelations += self.words[j] + " " + str(self.relations[i][j]) + ", "
-            print(word.ljust(maxSize) + ": " + str(deepRelations) + "]")
+            print(str(i) + "." + word.ljust(maxSize) + ": " + str(deepRelations) + "]")
+
+    def cleanWAC(self, wac, redirections=[]):
+        r = []
+        flatA = []
+        for i in range(self.lenwords):
+            if (i not in redirections) and (wac[i] != {}): # can be empty if redirections were cleaned
+                value = wac[i]["value"]
+                flatA.extend(value)
+        for n in flatA:
+            r.append(self.words[n])
+        return r
+
+    # Pretty print Words And Clusters and Remove redirections
+    def ppWAC(self, wac, redirections=[]):
+        print(str(self.cleanWAC(wac, redirections)))
+
+    def pWAC(self, wac, redirections=[]):
+        r = []
+        for i in range(self.lenwords):
+            if i in redirections:
+                r.append({})
+            else:
+                r.append(wac[i])
+        print(str(r))
 
     # Returns the first word without a prefix
     # If no word can be found without a prefix, returns the first word from the list
@@ -207,9 +232,9 @@ class RussianWordsClusters:
         return array[0]
 
     @staticmethod
-    def flatten(wordsWithClusters):
+    def flatten(wac):
         flat = []
-        for e in wordsWithClusters:
+        for e in wac:
             if isinstance(e, str):
                 flat.append(e)
             else: # isinstance(e, list)
@@ -219,10 +244,11 @@ class RussianWordsClusters:
 
     # Returns words that match with word of value words[i]
     # Returns word of value words[i] if no match was found
-    def groupOn(self, i, criterias, wordsWithClusters, disabledWords=[], redirections=[]):
+    def groupOn(self, i, criterias, wac, disabledWords=[], redirections=[]):
         nbCriterias = len(criterias)
-        if i in disabledWords: # skip verb if she was already clustered
-            return wordsWithClusters, disabledWords, redirections
+        #if i in disabledWords: # skip verb if she was already clustered
+        #    return wac, disabledWords, redirections
+
         currentWord = self.words[i]
         currentCriteria = criterias[0]
 
@@ -235,58 +261,111 @@ class RussianWordsClusters:
             if link & Relation.NONE:
                 continue
             if link & currentCriteria:
+                wac[i]["type"] = currentCriteria
+                wac[i]["value"].extend(wac[j]["value"])
+                wac[j] = wac[i]
                 newWords.append(j)
-                wordsWithClusters[i].extend(wordsWithClusters[j])
-                wordsWithClusters[j] = wordsWithClusters[i]
                 redirections.append(j)
-                disabledWords.append(i)
-
-        # If no words with a high priority are matched, then fetch words of lower priority
-        if (len(newWords) == 0 and nbCriterias > 1):
-            nbCriteriasLeft = nbCriterias - 1
-            wordsWithClusters, disabledWords, redirections =\
-                self.groupOn(i, criterias[-nbCriteriasLeft:], wordsWithClusters, disabledWords, redirections)
+                disabledWords.append(j) # disable a verb once its clustered
+                if i not in disabledWords:
+                    disabledWords.append(i)
 
         # Append words with criterias of lower priority
         for w in newWords:
-            if nbCriterias > 1:
-                nbCriteriasLeft = nbCriterias - 1
-                wordsWithClusters, disabledWords, redirections =\
-                    self.groupOn(w, criterias[-nbCriteriasLeft:], wordsWithClusters, disabledWords, redirections)
-            disabledWords.append(w)
+            wac, disabledWords, redirections =\
+                self.groupOn(w, [currentCriteria], wac, disabledWords, redirections)
 
-        return wordsWithClusters, disabledWords, redirections
+        return wac, disabledWords, redirections
+
+    # Returns the position of a word of reference i in the array of subsets WAC
+    # Returne None if not found
+    def getNewSubsetId(self, k, wac):
+        for i in range(len(wac)):
+            subset = wac[i]
+            if subset == {}:
+                continue
+            if k in subset["value"]:
+                return i
+
+        return None
 
     def getWordsAndClusters(self, criterias, mergeCriterias):
         self.setRelations(criterias)
         #self.prettyPrintRelations()
 
-        wordsWithClusters = []
-        for word in self.words:
-            wordsWithClusters.append([word])
+        wac = []
+        for n in range(self.lenwords):
+            e = {"type": Relation.NONE, "value": [n]}
+            wac.append(e)
         disabledWords = []
         redirections = []
 
         # Build groups using recursion, e.i. if a-b and b-c then we build the group a-b-c
         # Option mergeCriterias merges groups of different criterias as long as there is a link between words
         # e.i. if a-b and b+c then we build the group a-b+c
-        if not mergeCriterias:
-            for criteria in criterias:
-                for i in range(self.lenwords):
-                    wordsWithClusters, disabledWords, redirections =\
-                        self.groupOn(i, [criteria], wordsWithClusters, disabledWords, redirections)
-        else:
+
+        # a-b-c
+        builtClusters = [] # clusters formed after each Criteria
+        for criteria in criterias:
             for i in range(self.lenwords):
-                wordsWithClusters, disabledWords, redirections =\
-                    self.groupOn(i, criterias, wordsWithClusters, disabledWords, redirections)
+                if i in builtClusters: # We avoid mixing a cluster built from one Criteria with a cluster of another Criteria
+                    continue
+                wac, disabledWords, redirections =\
+                    self.groupOn(i, [criteria], wac, disabledWords, redirections)
+            builtClusters = disabledWords
 
-        # Remove redirections
-        r = []
-        for i in range(self.lenwords):
-            if i not in redirections:
-                r.extend(wordsWithClusters[i])
-        return r
+        if mergeCriterias:
+            # 1. Clean redirections
+            newWAC = []
+            for i in range(self.lenwords):
+                if i in redirections:
+                    newWAC.append({})
+                else:
+                    newWAC.append(wac[i])
+            wac = newWAC
 
+            # 2. set cluster relations
+            # Pour chaque sous-ensemble du groupe on récupère sa relation qu'on affecte à
+            # un nouveau tableau des relations en 2D prenant :
+            #   * pour indice i = l'indice actuel du tableau wac
+            #   * pour indice j = l'indice actuel du tableau wac
+            #   * pour valeur = la relation la plus forte (selon les critères définis) entre les éléments de 2 sous-ensembles
+            newClusterRelations = [[Relation.NONE for i in range(self.lenwords)] for j in range(self.lenwords)]
+            wordsRelations = copy.deepcopy(self.relations)
+            disabledClusters = []
+            copywac = copy.copy(wac) # would be better to use but it is needed to refresh subsets in the following code
+
+            for criteria in criterias[1:]: # warn: not tested with more than 2 criterias, could merge too many clusters and not have the expected behaviour
+                for i, e in enumerate(wac): # Pour chaque sous-ensemble
+                    if e == {}:
+                        continue
+                    else:
+                        assert i == e["value"][0] # assert que le premier element d'un sous-ensemble est égal à la position du sous-ensemble dans le WAC
+
+                    t = e["type"] # type de cluster
+                    for numWord in e["value"]: # Pour chaque element d'un sous-ensemble, récupérer les liens du tableau original des relations
+                        if numWord in disabledClusters:
+                            continue
+                        for k in range(self.lenwords): # Looking for a k matching with numWord. If it matches we create a clusterRelation
+                            link = wordsRelations[numWord][k]
+                            if k in disabledClusters:
+                                continue
+
+                            if k in e["value"]: # Skip. We are not interested by relations with words already in the subset
+                                continue
+
+                            if link & Relation.NONE:
+                                continue
+
+                            if link & criteria: # TODO: need improvements to manage 2+ criterias => would have to prioritize criterias relations before assignement in newClusterRelations
+                                subsetId = self.getNewSubsetId(k, wac)
+                                assert subsetId >= 0 and subsetId < len(wac)
+                                newClusterRelations[i][subsetId] = criteria
+                                wac[i]["value"].extend(wac[subsetId]["value"])
+                                wac[subsetId] = {}
+                                disabledClusters.append(k)
+
+        return self.cleanWAC(wac, redirections)
 
 class RussianWordsPairsClusters(RussianWordsClusters):
 
@@ -363,7 +442,7 @@ if __name__ == '__main__':
     else:
         rwc = RussianWordsClusters(words)
 
-    wordsWithClusters = rwc.getWordsAndClusters(clusteringPriorities, mergeCriterias)
+    wac = rwc.getWordsAndClusters(clusteringPriorities, mergeCriterias)
 
-    for e in wordsWithClusters:
+    for e in wac:
         print(str(e))
