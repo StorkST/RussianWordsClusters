@@ -267,15 +267,18 @@ class RussianWordsClusters:
         disabledWords = []
         redirections = []
 
-        if mergeCriterias:
-            for i in range(self.lenwords):
-                wordsWithClusters, disabledWords, redirections =\
-                    self.groupOn(i, criterias, wordsWithClusters, disabledWords, redirections)
-        else:
+        # Build groups using recursion, e.i. if a-b and b-c then we build the group a-b-c
+        # Option mergeCriterias merges groups of different criterias as long as there is a link between words
+        # e.i. if a-b and b+c then we build the group a-b+c
+        if not mergeCriterias:
             for criteria in criterias:
                 for i in range(self.lenwords):
                     wordsWithClusters, disabledWords, redirections =\
                         self.groupOn(i, [criteria], wordsWithClusters, disabledWords, redirections)
+        else:
+            for i in range(self.lenwords):
+                wordsWithClusters, disabledWords, redirections =\
+                    self.groupOn(i, criterias, wordsWithClusters, disabledWords, redirections)
 
         # Remove redirections
         r = []
