@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="RussianWordsClusters",
-    version="0.0.7",
+    version="0.0.8",
     author="Vincent Charrade",
     author_email="vchd@pm.me",
     description="Clustering russian words by multiple criterias",

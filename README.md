@@ -20,7 +20,7 @@ Content of `file1`:
 отличить
 ```
 
-`python3.8 cluster.py --input test1 --criterias STEM TRANS --merge`
+`python3.8 clustering.py --input file1 --criterias STEM TRANS --merge`
 ```
 выстрелить
 застрелить
@@ -31,10 +31,10 @@ Content of `file1`:
 ## Usage
 
 #### CLI
-The CLI `cluster.py` offers the possibility to cluster words and words pairs.
+The CLI `clustering.py` offers the possibility to cluster words and words pairs.
 
 #### Classes
-Classes in `cluster.py` can be called to cluster words. As for usage examples, you can refer to the code in the Main part of `cluster.py`, or to the code contained in the `tests` folder.
+Classes in `clustering.py` can be called to cluster words. As for usage examples, you can refer to the code in the Main part of `clustering.py`, or to the code contained in the `tests` folder.
 
 Project has a pip package: https://pypi.org/project/russian-words-clusters/</br>
 Once the package installed you can import classes into your Python code using `from russianwords.clustering import *`.
@@ -52,7 +52,7 @@ Content of `file2`:
 выделяться/выделять
 ```
 
-`python3.8 cluster.py --input test2 --criterias STEM TRANS --merge --are-pairs`
+`python3.8 clustering.py --input file2 --criterias STEM TRANS --merge --are-pairs`
 ```
 посещать/посетить
 разделять
