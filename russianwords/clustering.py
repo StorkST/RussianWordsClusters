@@ -129,6 +129,22 @@ class RussianWordsClusters:
         if (w1Stem == w2Stem):
             return Relation.STEM
 
+        # special case. Example: расспрашивать/расспросить - опрашивать/опросить
+        if word1.startswith("расс") or word2.startswith("расс"):
+            paccWord = ""
+            otherWord = ""
+            if word1.startswith("расс"):
+                paccWord = word1
+                otherWord = word2
+            else:
+                paccWord = word2
+                otherWord = word1
+            exPacc = RussianWordsClusters.noReflexiveForm(paccWord)
+            exPacc = paccWord[len("расс"):]
+            otherWord = RussianWordsClusters.possibleStem(otherWord)
+            if (exPacc == otherWord):
+                return Relation.STEM
+
         #   2. The result of the "longer non reflexive word" minus the "shorter non reflexive word" may give a known verb Prefix
         #    , if that's the case then we can assume the two verbs have the same stem
         cmp1 = RussianWordsClusters.noReflexiveForm(word1)
